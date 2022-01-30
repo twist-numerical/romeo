@@ -6,6 +6,7 @@ WebGLCanvas(
   @mousemove="onMousemove",
   @mouseup="onMoveend",
   @wheel="onWheel",
+  @click="onClick",
   @touchstart="onTouchstart",
   @touchmove="onTouchmove",
   @touchend="onMoveend"
@@ -67,6 +68,7 @@ export default defineComponent({
       } | null,
       mountID: 0,
       needsUpdate: true,
+      afterMove: false,
     };
   },
   mounted() {
@@ -127,6 +129,7 @@ export default defineComponent({
         position: [event.clientX, event.clientY],
         distance: -1,
       };
+      this.afterMove = false;
     },
     onMousemove(event: MouseEvent) {
       if ((event.buttons & 1) == 0) this.touchPosition = null;
@@ -139,6 +142,7 @@ export default defineComponent({
       this.center[0] += f * (tp.position[0] - event.clientX);
       this.center[1] += f * (event.clientY - tp.position[1]);
       tp.position = [event.clientX, event.clientY];
+      this.afterMove = true;
     },
     onTouchstart(event: TouchEvent) {
       if (event.touches.length == 1 || event.touches.length == 2) {
@@ -149,6 +153,7 @@ export default defineComponent({
       } else {
         this.touchPosition = null;
       }
+      this.afterMove = false;
     },
     onTouchmove(event: TouchEvent) {
       if (event.touches.length != 1 && event.touches.length != 2)
@@ -170,9 +175,19 @@ export default defineComponent({
         tp.distance = d;
       }
       tp.position = [tx, ty];
+      this.afterMove = true;
     },
-    onMoveend() {
+    onMoveend(event: MouseEvent | TouchEvent) {
+      if (this.touchPosition) {
+        event.preventDefault();
+      }
       this.touchPosition = null;
+    },
+    onClick(event: MouseEvent) {
+      if (this.afterMove) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
     },
     onWheel(event: WheelEvent) {
       if (event.deltaY == 0) return;

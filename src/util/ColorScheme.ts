@@ -65,7 +65,7 @@ colorSchemes["UGent"] = new ColorScheme([
   "DC4E28",
   "825491",
 ]);
-colorSchemes["rainbow"] = new ColorScheme([
+colorSchemes["Rainbow"] = new ColorScheme([
   "ff7f00",
   "7fff00",
   "00ff7f",
@@ -73,3 +73,4 @@ colorSchemes["rainbow"] = new ColorScheme([
   "7f00ff",
   "ff007f",
 ]);
+colorSchemes["Gray"] = new ColorScheme(["FFFFFF", "999999"]);

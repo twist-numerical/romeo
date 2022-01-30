@@ -11,16 +11,17 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   data() {
-    return { open: false };
+    return { open: true };
   },
 });
 </script>
 
 
 <style lang="scss">
+@import "../style/vars.scss";
+
 .hamburger-menu {
   $width: min(200px, 30vw);
-  $pad: 0.5rem;
   $background: rgba(255, 255, 255, 0.9);
 
   position: absolute;

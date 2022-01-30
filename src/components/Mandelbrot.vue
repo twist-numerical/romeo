@@ -20,8 +20,6 @@ const srcShader =
 
 out vec4 oColor;
 
-uniform vec2 c;
-
 vec2 cMul(vec2 a, vec2 b) {
   return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
 }
@@ -35,13 +33,14 @@ vec3 color(int steps) {
 }
 
 void main() {
-  vec2 z = point();
+  vec2 c = point();
+  vec2 z = vec2(0., 0.);
 
   int steps = -1;
   for(int i = 0; i < MAXSTEPS; ++i) {
     z = cMul(z, z) + c;
     if(cMod(z) > 2.0) {
-      steps = i;
+      steps =i ;
       break;
     }
   }
@@ -59,10 +58,6 @@ export default defineComponent({
       type: String,
       default: "rainbow",
     },
-    c: {
-      type: Array,
-      default: [-0.8, 0.156],
-    },
   },
   data() {
     return {
@@ -72,9 +67,6 @@ export default defineComponent({
   methods: {
     onBeforeRender(gl: WebGL2RenderingContext, program: twgl.ProgramInfo) {
       ColorScheme.schemes[this.colorScheme].setUniforms(program);
-      twgl.setUniforms(program, {
-        c: this.c,
-      });
 
       // console.log("Before render");
     },
