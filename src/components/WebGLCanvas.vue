@@ -5,9 +5,9 @@ div
 
 <script lang="ts">
 import * as twgl from "twgl.js";
-import * as Vue from "vue";
+import { defineComponent } from "vue";
 
-export default Vue.defineComponent({
+export default defineComponent({
   props: {
     scaling: {
       default: 1,

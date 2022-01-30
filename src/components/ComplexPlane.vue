@@ -14,7 +14,7 @@ WebGLCanvas(
 
 <script lang="ts">
 import * as twgl from "twgl.js";
-import * as Vue from "vue";
+import { defineComponent } from "vue";
 import WebGLCanvas from "./WebGLCanvas.vue";
 import SquareShader from "../util/SquareShader";
 
@@ -51,7 +51,7 @@ function touchDistance(touches: TouchList) {
   return 1;
 }
 
-export default Vue.defineComponent({
+export default defineComponent({
   components: { WebGLCanvas },
   props: {
     shader: { type: String },

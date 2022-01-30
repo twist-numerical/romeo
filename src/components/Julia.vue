@@ -9,10 +9,13 @@ ComplexPlane(
 
 <script lang="ts">
 import * as twgl from "twgl.js";
-import * as Vue from "vue";
+import { defineComponent } from "vue";
 import ComplexPlane from "./ComplexPlane.vue";
+import ColorScheme from "../util/ColorScheme";
 
-const srcShader = `
+const srcShader =
+  ColorScheme.glslCode +
+  `
 #define MAXSTEPS 500
 
 out vec4 oColor;
@@ -25,15 +28,8 @@ float cMod(vec2 a) {
   return length(a);
 }
 
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
 vec3 color(int steps) {
-  return hsv2rgb(vec3(0.1+0.5*log(1.0+30.0*float(steps)/float(MAXSTEPS)), 1.0, 0.8));
+  return colorScheme(float(steps)/60.0);
 }
 
 void main() {
@@ -54,8 +50,14 @@ void main() {
   }
 }`;
 
-export default Vue.defineComponent({
+export default defineComponent({
   components: { ComplexPlane },
+  props: {
+    colorScheme: {
+      type: String,
+      default: "rainbow",
+    },
+  },
   data() {
     return {
       shader: srcShader,
@@ -63,6 +65,8 @@ export default Vue.defineComponent({
   },
   methods: {
     onBeforeRender(gl: WebGL2RenderingContext, program: twgl.ProgramInfo) {
+      ColorScheme.schemes[this.colorScheme].setUniforms(program);
+
       // console.log("Before render");
     },
     onAfterRender(gl: WebGL2RenderingContext) {
