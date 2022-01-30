@@ -1,27 +1,25 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+<template lang="pug">
+Julia#julia
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import HelloWorld from "./components/HelloWorld.vue";
+import Julia from "./components/Julia.vue";
+import * as Vue from "vue";
 
-@Options({
+export default Vue.defineComponent({
   components: {
-    HelloWorld,
+    Julia,
   },
-})
-export default class App extends Vue {}
+});
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+html,
+body,
+#app,
+#julia {
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
 </style>
