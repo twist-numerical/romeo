@@ -37,7 +37,7 @@ export default defineComponent({
   data() {
     return {
       colorSchemes: Object.keys(colorSchemes),
-      activeScheme: "Rainbow",
+      activeScheme: "UGent",
       marker: [-0.8, 0.156],
       isMounted: false,
     };
