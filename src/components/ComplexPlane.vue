@@ -18,6 +18,20 @@ import * as twgl from "twgl.js";
 import { defineComponent } from "vue";
 import WebGLCanvas from "./WebGLCanvas.vue";
 import SquareShader from "../util/SquareShader";
+import { saveAs } from "file-saver";
+
+function flipImage(image: ImageData) {
+  const data = new Int32Array(image.data.buffer);
+  for (let i = 0; 2 * i < image.height; ++i) {
+    for (let j = 0; j < image.width; ++j) {
+      const k1 = i * image.width + j;
+      const k2 = (image.height - i - 1) * image.width + j;
+      const t = data[k1];
+      data[k1] = data[k2];
+      data[k2] = t;
+    }
+  }
+}
 
 type vec2 = [number, number];
 
@@ -70,6 +84,8 @@ export default defineComponent({
       isMounted: false,
       needsUpdate: true,
       afterMove: false,
+      rendering: true,
+      activeFramebuffer: null as twgl.FramebufferInfo | null,
     };
   },
   mounted() {
@@ -80,7 +96,8 @@ export default defineComponent({
     const update = () => {
       if (mountID != this.mountID) return;
 
-      if (this.needsUpdate || this.shouldRender()) this.render();
+      if (this.rendering && (this.needsUpdate || this.shouldRender()))
+        this.render();
 
       requestAnimationFrame(update);
     };
@@ -124,7 +141,7 @@ export default defineComponent({
       const shader = this.squareShader;
       if (!gl || !shader) return;
       this.$emit("beforeRender", this);
-      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+      twgl.bindFramebufferInfo(gl, this.activeFramebuffer);
       shader.useProgram();
       twgl.setUniforms(shader.programInfo, this.allUniforms);
       shader.draw();
@@ -212,6 +229,40 @@ export default defineComponent({
       let step = 1.1;
       if (event.deltaY < 0) step = 1 / step;
       this.zoom *= step;
+    },
+    resetView() {
+      this.center = [0, 0];
+      this.zoom = 3;
+    },
+    async generateImage(size = 4098): Promise<ImageData> {
+      return new Promise((resolve, reject) => {
+        const gl = this.context;
+        if (!gl) return reject("No context present");
+        const fb = twgl.createFramebufferInfo(
+          gl,
+          [{ format: gl.RGBA, type: gl.UNSIGNED_BYTE }],
+          size,
+          size
+        );
+
+        this.rendering = false;
+        this.activeFramebuffer = fb;
+        this.onResize(size, size);
+
+        this.$nextTick(() => {
+          this.render();
+          twgl.bindFramebufferInfo(gl, fb);
+          const pixels = new Uint8ClampedArray(size * size * 4);
+          gl.readPixels(0, 0, size, size, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+          this.activeFramebuffer = null;
+          this.onResize(gl.canvas.width, gl.canvas.height);
+          this.rendering = true;
+
+          const imageData = new ImageData(pixels, size, size);
+          flipImage(imageData);
+          resolve(imageData);
+        });
+      });
     },
   },
   watch: {

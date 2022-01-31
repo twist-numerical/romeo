@@ -2,7 +2,7 @@
 .hamburger-menu(:class="{ open: open }")
   i.hamburger-button.bi.bi-list(@click="open = !open")
   .hamburger-container
-    .hamburger-content.px-3.py-2
+    .hamburger-content
       slot
 </template>
 
@@ -21,7 +21,7 @@ export default defineComponent({
 @import "../style/vars.scss";
 
 .hamburger-menu {
-  $width: min(200px, 30vw);
+  $width: min(300px, 30vw);
   $background: rgba(255, 255, 255, 0.9);
 
   position: absolute;

@@ -1,15 +1,36 @@
 <template lang="pug">
 #container
   Hamburger
-    label.form-check(v-for="scheme of colorSchemes")
-      input.form-check-input(
-        type="radio",
-        v-model="activeScheme",
-        :value="scheme"
-      )
-      span.form-check-label {{ scheme }}
+    form.p-3
+      fieldset
+        legend Romeo
+        .form-label Colour scheme
+        .ps-3
+          label.form-check(v-for="scheme of colorSchemes")
+            input.form-check-input(
+              type="radio",
+              v-model="activeScheme",
+              :value="scheme"
+            )
+            span.form-check-label {{ scheme }}
 
-  Julia#julia(:colorScheme="activeScheme", :c="marker")
+      hr 
+
+      button.btn.btn-link.disabled(
+        v-if="loadingDownload",
+        type="button",
+        @click.prevent="",
+        disabled
+      ) Loading image...
+      button.btn.btn-link(
+        v-else,
+        type="button",
+        @click.prevent="downloadImage"
+      ) Download image
+
+      button.btn.btn-secondary(type="button", @click.prevent="resetView") Reset view
+
+  Julia#julia(:colorScheme="activeScheme", ref="julia", :c="marker")
   #mandelbrot-container
     .position-relative.h-100
       Mandelbrot#mandelbrot(
@@ -30,6 +51,26 @@ import Mandelbrot from "./components/Mandelbrot.vue";
 import ComplexNumber from "./components/ComplexNumber.vue";
 import Hamburger from "./components/Hamburger.vue";
 import { colorSchemes } from "./util/ColorScheme";
+import downloadImage from "./util/downloadImage";
+
+const getDownloadSize = (() => {
+  const w = window as any;
+  w.downloadSize = 4096;
+
+  const gl = document
+    .createElement("canvas")
+    .getContext("webgl2") as WebGL2RenderingContext;
+  const maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+  console.log(
+    `The maximum possible image size is ${maxSize} by ${maxSize} pixels. ` +
+      `The current value is ${w.downloadSize}. ` +
+      `To change this value execute \`window.downloadSize = 8196;\`.`
+  );
+
+  return () => {
+    return Math.min(w.downloadSize, maxSize);
+  };
+})();
 
 export default defineComponent({
   components: {
@@ -44,6 +85,7 @@ export default defineComponent({
       activeScheme: "UGent",
       marker: [-0.124, -0.713],
       isMounted: false,
+      loadingDownload: false,
     };
   },
   mounted() {
@@ -77,6 +119,28 @@ export default defineComponent({
         cx + plane.zoom * ((event.clientX - rect.x) / plane.vmin - 0.5),
         cy + plane.zoom * (0.5 - (event.clientY - rect.y) / plane.vmin),
       ];
+    },
+    resetView() {
+      (this.$refs.mandelbrot as any).resetView();
+      (this.$refs.julia as any).resetView();
+    },
+    async downloadImage() {
+      try {
+        this.loadingDownload = true;
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+        const image: ImageData = await (this.$refs.julia as any).generateImage(
+          getDownloadSize()
+        );
+
+        let filename = "julia." + this.marker[0].toFixed(8);
+        const b = this.marker[1].toFixed(8) + "i";
+        if (!b.startsWith("-")) filename += "+";
+        filename += b;
+
+        downloadImage(image, filename);
+      } finally {
+        this.loadingDownload = false;
+      }
     },
   },
 });

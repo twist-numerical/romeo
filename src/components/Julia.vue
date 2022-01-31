@@ -19,7 +19,8 @@ import SquareShader from "@/util/SquareShader";
 
 type CPlane = InstanceType<typeof ComplexPlane>;
 
-const MAX_STEPS = 200;
+const STEPS_PER_STAGE = 200;
+const MAX_STEPS = 10000;
 
 const srcShader1 =
   complexPlaneShaderHeader +
@@ -33,7 +34,7 @@ void main() {
 }`;
 
 const srcShader2 = `
-#define MAXSTEPS ${MAX_STEPS}
+#define MAXSTEPS ${STEPS_PER_STAGE}
 
 uniform sampler2D uInput;
 out vec4 oOutput;
@@ -101,6 +102,7 @@ export default defineComponent({
       framebuffers: [] as twgl.FramebufferInfo[],
       squareShaders: [] as SquareShader[],
       stepsExecuted: 0,
+      largeImage: false,
     };
   },
   computed: {
@@ -149,7 +151,6 @@ export default defineComponent({
       twgl.bindFramebufferInfo(gl, this.framebuffers[0]);
       shader.draw();
       this.stepsExecuted = 0;
-      twgl.bindFramebufferInfo(gl);
     },
     render2(plane: CPlane) {
       const gl = this.context as WebGL2RenderingContext;
@@ -158,8 +159,8 @@ export default defineComponent({
       gl.finish();
       const start = performance.now();
       let i = 0;
-      do {
-        ++i;
+
+      const singleStage = () => {
         [0, 1].forEach((i) => {
           shader.useProgram();
           twgl.setUniforms(shader.programInfo, {
@@ -168,31 +169,56 @@ export default defineComponent({
           });
           twgl.bindFramebufferInfo(gl, this.framebuffers[1 - i]);
           shader.draw();
-          this.stepsExecuted += MAX_STEPS;
         });
-        gl.flush();
-        gl.finish();
-      } while (performance.now() - start < 5 && i < 5);
+      };
 
-      twgl.bindFramebufferInfo(gl);
+      if (this.largeImage) {
+        for (let i = 0; i < MAX_STEPS; i += STEPS_PER_STAGE) {
+          singleStage();
+        }
+      } else {
+        do {
+          ++i;
+          singleStage();
+          this.stepsExecuted += STEPS_PER_STAGE;
+          gl.flush();
+          gl.finish();
+        } while (performance.now() - start < 5 && i < 5);
+      }
     },
     onBeforeRender(plane: CPlane) {
+      if (this.largeImage) console.log("Render large");
       if (this.context !== plane.context) this.initGL(plane);
       if (plane.needsUpdate) {
         this.render1(plane);
       }
-      if (this.stepsExecuted < 50000) this.render2(plane);
+      if (this.stepsExecuted < MAX_STEPS) this.render2(plane);
       // console.log("Before render");
     },
     onAfterRender(plane: CPlane) {
       // console.log("Render done");
     },
-    onResize() {
+    onResize(width: number, height: number) {
       const gl = this.context;
       if (!gl) return;
       this.framebuffers.forEach((f) =>
-        twgl.resizeFramebufferInfo(gl, f, this.framebufferAttachments)
+        twgl.resizeFramebufferInfo(
+          gl,
+          f,
+          this.framebufferAttachments,
+          width,
+          height
+        )
       );
+    },
+    resetView() {
+      (this.$refs.complexPlane as any).resetView();
+    },
+    async generateImage(size: number): Promise<ImageData> {
+      this.largeImage = true;
+      const img = await (this.$refs.complexPlane as CPlane).generateImage(size);
+      this.largeImage = false;
+      return img;
     },
   },
 });

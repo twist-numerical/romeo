@@ -17,7 +17,7 @@ import ColorScheme from "../util/ColorScheme";
 const srcShader =
   ColorScheme.glslCode +
   `
-#define MAXSTEPS 500
+#define MAXSTEPS 800
 
 out vec4 oColor;
 
@@ -75,6 +75,9 @@ export default defineComponent({
     },
     onAfterRender(gl: WebGL2RenderingContext) {
       // console.log("Render done");
+    },
+    resetView() {
+      (this.$refs.complexPlane as any).resetView();
     },
   },
 });
