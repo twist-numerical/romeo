@@ -178,7 +178,7 @@ export default defineComponent({
       this.afterMove = true;
     },
     onMoveend(event: MouseEvent | TouchEvent) {
-      if (this.touchPosition) {
+      if (this.afterMove) {
         event.preventDefault();
       }
       this.touchPosition = null;
