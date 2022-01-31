@@ -2,6 +2,7 @@
 ComplexPlane(
   :shader="shader",
   ref="complexPlane",
+  :uniforms="uniforms",
   @beforeRender="onBeforeRender",
   @afterRender="onAfterRender"
 )
@@ -44,11 +45,8 @@ void main() {
       break;
     }
   }
-  if(steps == -1) {
-    oColor = vec4(0.,0.,0.,1.);
-  } else {
-    oColor = vec4(color(steps),1.);
-  }
+  
+  oColor= vec4(color(steps), 1.0);
 }`;
 
 export default defineComponent({
@@ -64,10 +62,15 @@ export default defineComponent({
       shader: srcShader,
     };
   },
+  computed: {
+    uniforms() {
+      return {
+        ...ColorScheme.schemes[this.colorScheme].uniforms,
+      };
+    },
+  },
   methods: {
     onBeforeRender(gl: WebGL2RenderingContext, program: twgl.ProgramInfo) {
-      ColorScheme.schemes[this.colorScheme].setUniforms(program);
-
       // console.log("Before render");
     },
     onAfterRender(gl: WebGL2RenderingContext) {

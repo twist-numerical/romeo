@@ -19,12 +19,15 @@
       )
       #bullseye.align-middle(:style="bullseye")
         i.bi.bi-bullseye
+    .mandelbrot-info
+      ComplexNumber(:value="marker")
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import Julia from "./components/Julia.vue";
 import Mandelbrot from "./components/Mandelbrot.vue";
+import ComplexNumber from "./components/ComplexNumber.vue";
 import Hamburger from "./components/Hamburger.vue";
 import { colorSchemes } from "./util/ColorScheme";
 
@@ -33,12 +36,13 @@ export default defineComponent({
     Julia,
     Hamburger,
     Mandelbrot,
+    ComplexNumber,
   },
   data() {
     return {
       colorSchemes: Object.keys(colorSchemes),
       activeScheme: "UGent",
-      marker: [-0.8, 0.156],
+      marker: [-0.124, -0.713],
       isMounted: false,
     };
   },
@@ -73,7 +77,6 @@ export default defineComponent({
         cx + plane.zoom * ((event.clientX - rect.x) / plane.vmin - 0.5),
         cy + plane.zoom * (0.5 - (event.clientY - rect.y) / plane.vmin),
       ];
-      console.log(this.marker);
     },
   },
 });
@@ -95,15 +98,25 @@ body,
   position: absolute;
   top: $pad;
   left: $pad;
-  width: 40vmin;
-  height: 40vmin;
   border-radius: $pad;
   overflow: hidden;
 
   #mandelbrot {
-    width: 100%;
-    height: 100%;
-    opacity: 0.95;
+    opacity: 0.9;
+    width: 40vmin;
+    height: 40vmin;
+    clip-path: path("M 0 2rem L 0,75 A 5,5 0,0,1 150,75 L 200 200 z");
+  }
+
+  .mandelbrot-info {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: $pad 0 0 0;
+    padding: $pad calc(3 * $pad);
+    bottom: 0;
+    right: 0;
+    text-align: right;
+    font-size: 1.2em;
   }
 
   #bullseye {

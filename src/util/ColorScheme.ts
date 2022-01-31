@@ -10,19 +10,28 @@ function lerp(a: number, b: number, v: number) {
 
 export const colorSchemes: { [name: string]: ColorScheme } = {};
 
+function parseColor(color: string | Color): Color {
+  if (typeof color == "string") {
+    const n = +("0x" + color);
+    return [
+      ((n >> 16) & 0xff) / 0xff,
+      ((n >> 8) & 0xff) / 0xff,
+      ((n >> 0) & 0xff) / 0xff,
+    ];
+  } else return color;
+}
+
 export default class ColorScheme {
-  readonly steps: Color[] = [];
+  readonly steps: Color[];
+  readonly negative: Color;
   private _uniformCache: number[] | undefined = undefined;
 
-  constructor(_steps: string[]) {
-    _steps.forEach((s) => {
-      const n = +("0x" + s);
-      this.steps.push([
-        ((n >> 16) & 0xff) / 0xff,
-        ((n >> 8) & 0xff) / 0xff,
-        ((n >> 0) & 0xff) / 0xff,
-      ]);
-    });
+  constructor(
+    _steps: (string | Color)[],
+    _negative: string | Color = [0, 0, 0]
+  ) {
+    this.negative = parseColor(_negative);
+    this.steps = _steps.map(parseColor);
   }
 
   get(v: number): Color {
@@ -34,19 +43,24 @@ export default class ColorScheme {
     return [lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)];
   }
 
-  setUniforms(programInfo: twgl.ProgramInfo) {
+  get uniforms() {
     if (!this._uniformCache) {
       const uc: number[] = [];
       for (let i = 0; i <= interpolationSteps; ++i)
         uc.push(...this.get(i / interpolationSteps));
       this._uniformCache = uc;
     }
-    twgl.setUniforms(programInfo, { uColorScheme: this._uniformCache });
+    return {
+      uColorScheme: this._uniformCache,
+      uColorSchemeNegative: this.negative,
+    };
   }
 
   static glslCode: string = (() => {
     let code = `uniform vec3 uColorScheme[${interpolationSteps + 1}];`;
+    code += `uniform vec3 uColorSchemeNegative;`;
     code += `vec3 colorScheme(float v) {`;
+    code += `if(v < 0.0) return uColorSchemeNegative;`;
     code += `v = fract(v) * float(${interpolationSteps});`;
     code += `int i = int(v);`;
     code += `return mix(uColorScheme[i], uColorScheme[i + 1], v - float(i));`;
@@ -74,3 +88,18 @@ colorSchemes["Rainbow"] = new ColorScheme([
   "ff007f",
 ]);
 colorSchemes["Gray"] = new ColorScheme(["FFFFFF", "999999"]);
+
+colorSchemes["Pink"] = new ColorScheme(
+  ["91589C", "B26AA6", "C87DA2", "D28AC6", "D198DB"],
+  "FF7BE2"
+);
+
+colorSchemes["Hot and cold"] = new ColorScheme(
+  [
+    [0.2298057, 0.298717966, 0.753683153],
+    [0.865395197, 0.86541021, 0.865395561],
+    [0.705673158, 0.01555616, 0.150232812],
+    [0.865395197, 0.86541021, 0.865395561],
+  ],
+  "000000"
+);

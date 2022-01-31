@@ -21,7 +21,7 @@ export default class SquareShader {
     });
     this.programInfo = twgl.createProgramInfo(gl, [
       vertexShader,
-      "#version 300 es\nprecision highp float;" + fragmentShader,
+      "#version 300 es\nprecision highp float;in vec2 vPixel;" + fragmentShader,
     ]);
   }
 
