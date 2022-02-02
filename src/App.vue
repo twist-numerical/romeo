@@ -30,7 +30,7 @@
 
       button.btn.btn-secondary(type="button", @click.prevent="resetView") Reset view
 
-  SidePanel(icon="bi-info", position="bottom left")
+  SidePanel(icon="bi-info", position="bottom right")
     .p-3
       p Test
       p more Test
@@ -40,6 +40,7 @@
         li item
 
   Julia#julia(:colorScheme="activeScheme", ref="julia", :c="marker")
+
   #mandelbrot-container
     .position-relative.h-100
       Mandelbrot#mandelbrot(
@@ -61,6 +62,9 @@ import ComplexNumber from "./components/ComplexNumber.vue";
 import SidePanel from "./components/SidePanel.vue";
 import { colorSchemes } from "./util/ColorScheme";
 import downloadImage from "./util/downloadImage";
+import ComplexPlane from "./components/ComplexPlane.vue";
+
+type CPlane = InstanceType<typeof ComplexPlane>;
 
 const getDownloadSize = (() => {
   const w = window as any;
@@ -92,7 +96,7 @@ export default defineComponent({
     return {
       colorSchemes: Object.keys(colorSchemes),
       activeScheme: "UGent",
-      marker: [-0.124, -0.713],
+      marker: [0.25060365, -0.00002895], // [-0.124, -0.713],
       isMounted: false,
       loadingDownload: false,
     };
@@ -106,20 +110,23 @@ export default defineComponent({
   computed: {
     bullseye() {
       if (!this.isMounted) return { left: 0, right: 0 };
-      const plane = (this.$refs.mandelbrot as any).$refs.complexPlane as any;
+      const plane = (
+        (this.$refs.mandelbrot as any).$refs.complexPlane as CPlane
+      ).complexPlane;
 
       const [x, y] = (this as any).marker;
       const [cx, cy] = plane.center as [number, number];
-      const f = plane.vmin;
       return {
-        left: f * (0.5 + (x - cx) / plane.zoom) + "px",
-        top: f * (0.5 + (cy - y) / plane.zoom) + "px",
+        left: plane.vmin * (0.5 + (x - cx) / plane.zoom) + "px",
+        top: plane.vmin * (0.5 + (cy - y) / plane.zoom) + "px",
       };
     },
   },
   methods: {
     placeMarker(event: MouseEvent) {
-      const plane = (this.$refs.mandelbrot as any).$refs.complexPlane as any;
+      const plane = (
+        (this.$refs.mandelbrot as any).$refs.complexPlane as CPlane
+      ).complexPlane;
       const rect = (event.target as HTMLElement).getBoundingClientRect();
 
       const [cx, cy] = plane.center as [number, number];

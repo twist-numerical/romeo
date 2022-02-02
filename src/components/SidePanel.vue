@@ -1,6 +1,6 @@
 <template lang="pug">
 .side-panel(:class="sidePanelClasses")
-  i.side-panel-button.bi.bi-list(:class="[icon]", @click="open = !open")
+  i.side-panel-button.bi(:class="[icon]", @click="open = !open")
   .side-panel-container
     .side-panel-content
       slot

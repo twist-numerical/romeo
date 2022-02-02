@@ -1,11 +1,5 @@
 <template lang="pug">
-ComplexPlane(
-  :shader="shader",
-  ref="complexPlane",
-  :uniforms="uniforms",
-  @beforeRender="onBeforeRender",
-  @afterRender="onAfterRender"
-)
+ComplexPlane(ref="complexPlane", @render="onRender", @context="onContext")
 </template>
 
 <script lang="ts">
@@ -13,41 +7,9 @@ import * as twgl from "twgl.js";
 import { defineComponent } from "vue";
 import ComplexPlane from "./ComplexPlane.vue";
 import ColorScheme from "../util/ColorScheme";
+import MandelbrotShader from "../shaders/Mandelbrot";
 
-const srcShader =
-  ColorScheme.glslCode +
-  `
-#define MAXSTEPS 800
-
-out vec4 oColor;
-
-vec2 cMul(vec2 a, vec2 b) {
-  return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
-}
-
-float cMod(vec2 a) {
-  return length(a);
-}
-
-vec3 color(int steps) {
-  return colorScheme(float(steps)/60.0);
-}
-
-void main() {
-  vec2 c = point();
-  vec2 z = vec2(0., 0.);
-
-  int steps = -1;
-  for(int i = 0; i < MAXSTEPS; ++i) {
-    z = cMul(z, z) + c;
-    if(cMod(z) > 2.0) {
-      steps =i ;
-      break;
-    }
-  }
-  
-  oColor= vec4(color(steps), 1.0);
-}`;
+type CPlane = InstanceType<typeof ComplexPlane>;
 
 export default defineComponent({
   components: { ComplexPlane },
@@ -59,7 +21,7 @@ export default defineComponent({
   },
   data() {
     return {
-      shader: srcShader,
+      shader: null as MandelbrotShader | null,
     };
   },
   computed: {
@@ -70,11 +32,15 @@ export default defineComponent({
     },
   },
   methods: {
-    onBeforeRender(gl: WebGL2RenderingContext, program: twgl.ProgramInfo) {
-      // console.log("Before render");
+    onContext(gl: WebGL2RenderingContext) {
+      this.shader = new MandelbrotShader(
+        gl,
+        (this.$refs.complexPlane as CPlane).complexPlane as any
+      );
     },
-    onAfterRender(gl: WebGL2RenderingContext) {
-      // console.log("Render done");
+    onRender(fb: twgl.FramebufferInfo | null) {
+      if (this.shader)
+        this.shader.render(fb, ColorScheme.schemes[this.colorScheme]);
     },
     resetView() {
       (this.$refs.complexPlane as any).resetView();

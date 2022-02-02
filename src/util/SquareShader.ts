@@ -1,8 +1,13 @@
 import * as twgl from "twgl.js";
+import { deleteBuffer } from "./twglDelete";
 
-const vertexShader = `#version 300 es
+const header = `#version 300 es
 precision highp float;
+`;
 
+const vertexShader =
+  header +
+  `
 in vec2 pixel;
 out vec2 vPixel;
 
@@ -21,7 +26,7 @@ export default class SquareShader {
     });
     this.programInfo = twgl.createProgramInfo(gl, [
       vertexShader,
-      "#version 300 es\nprecision highp float;in vec2 vPixel;" + fragmentShader,
+      header + "in vec2 vPixel;" + fragmentShader,
     ]);
   }
 
@@ -32,5 +37,9 @@ export default class SquareShader {
   draw() {
     twgl.setBuffersAndAttributes(this.gl, this.programInfo, this.buffers);
     twgl.drawBufferInfo(this.gl, this.buffers, this.gl.TRIANGLE_STRIP);
+  }
+
+  dispose() {
+    deleteBuffer(this.gl, this.buffers);
   }
 }
