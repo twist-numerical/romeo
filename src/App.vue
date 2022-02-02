@@ -1,6 +1,6 @@
 <template lang="pug">
 #container
-  Hamburger
+  SidePanel(icon="bi-list", position="top right")
     form.p-3
       fieldset
         legend Romeo
@@ -30,6 +30,15 @@
 
       button.btn.btn-secondary(type="button", @click.prevent="resetView") Reset view
 
+  SidePanel(icon="bi-info", position="bottom left")
+    .p-3
+      p Test
+      p more Test
+      ul
+        li item
+        li item
+        li item
+
   Julia#julia(:colorScheme="activeScheme", ref="julia", :c="marker")
   #mandelbrot-container
     .position-relative.h-100
@@ -49,7 +58,7 @@ import { defineComponent } from "vue";
 import Julia from "./components/Julia.vue";
 import Mandelbrot from "./components/Mandelbrot.vue";
 import ComplexNumber from "./components/ComplexNumber.vue";
-import Hamburger from "./components/Hamburger.vue";
+import SidePanel from "./components/SidePanel.vue";
 import { colorSchemes } from "./util/ColorScheme";
 import downloadImage from "./util/downloadImage";
 
@@ -75,7 +84,7 @@ const getDownloadSize = (() => {
 export default defineComponent({
   components: {
     Julia,
-    Hamburger,
+    SidePanel,
     Mandelbrot,
     ComplexNumber,
   },
