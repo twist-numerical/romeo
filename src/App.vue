@@ -30,7 +30,7 @@
 
       button.btn.btn-secondary(type="button", @click.prevent="resetView") Reset view
 
-  SidePanel(icon="bi-info", position="bottom right")
+  SidePanel(icon="bi-info", position="bottom right", :open="false")
     .p-3
       p Test
       p more Test
@@ -96,7 +96,7 @@ export default defineComponent({
     return {
       colorSchemes: Object.keys(colorSchemes),
       activeScheme: "UGent",
-      marker: [0.25060365, -0.00002895], // [-0.124, -0.713],
+      marker: [-0.124, -0.713],
       isMounted: false,
       loadingDownload: false,
     };

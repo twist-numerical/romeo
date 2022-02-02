@@ -1,6 +1,6 @@
 <template lang="pug">
 .side-panel(:class="sidePanelClasses")
-  i.side-panel-button.bi(:class="[icon]", @click="open = !open")
+  i.side-panel-button.bi(:class="[icon]", @click="_open = !_open")
   .side-panel-container
     .side-panel-content
       slot
@@ -19,16 +19,25 @@ export default defineComponent({
       type: String,
       default: "top right",
     },
+    open: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     sidePanelClasses() {
       const a = this.position.split(" ").map((v) => "side-panel-" + v);
-      if (this.open) a.push("side-panel-open");
+      if (this._open) a.push("side-panel-open");
       return a;
     },
   },
   data() {
-    return { open: true };
+    return { _open: this.open };
+  },
+  watch: {
+    open() {
+      this._open = this.open;
+    },
   },
 });
 </script>
