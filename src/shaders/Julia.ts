@@ -3,6 +3,7 @@ import ColorScheme from "../util/ColorScheme";
 import ComplexPlane from "./ComplexPlane";
 import SquareShader from "@/util/SquareShader";
 import { deleteFramebuffer } from "@/util/twglDelete";
+import Axes from "./Axes";
 
 const STEPS_PER_STAGE = 200;
 
@@ -77,6 +78,7 @@ export default class Julia {
   shaders: { init: SquareShader; advance: SquareShader; render: SquareShader };
   stepsExecuted = 0;
   c: [number, number] = [0, 0];
+  axes: Axes;
 
   constructor(
     readonly gl: WebGL2RenderingContext,
@@ -103,6 +105,8 @@ export default class Julia {
       advance: new SquareShader(gl, srcShaderAdvance),
       render: new SquareShader(gl, srcShaderRender),
     };
+
+    this.axes = new Axes(gl, plane);
   }
 
   resize(width: number, height: number) {
@@ -151,6 +155,8 @@ export default class Julia {
       uSteps: this.framebuffers[0].attachments[1],
     });
     shader.draw();
+
+    this.axes.render(fb);
   }
 
   dispose() {

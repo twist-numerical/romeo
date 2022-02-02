@@ -1,8 +1,11 @@
 type vec2 = [number, number];
 
+const shaderUniforms = "uniform vec2 zoom;\nuniform vec2 center;";
+
 export default class ComplexPlane {
-  static header = `uniform vec2 zoom;
-    uniform vec2 center;
+  static shaderUniforms = shaderUniforms;
+  static header = `
+    ${shaderUniforms}
     
     vec2 point() {
       return center + zoom * (vPixel - 0.5);
