@@ -1,17 +1,22 @@
 import { deleteBuffer } from "@/util/twglDelete";
 import * as twgl from "twgl.js";
 import ComplexPlane from "./ComplexPlane";
+import * as v2 from "../util/vec2";
+
+type vec2 = v2.vec2;
 
 const vertexLineShader = `#version 300 es
 precision highp float;
 
 ${ComplexPlane.shaderUniforms}
 
-in vec2 position; 
+in vec2 position;
+in vec2 offset;
 
 void main() {
   gl_PointSize = 10.0;
-  gl_Position = vec4((position - center) / zoom*2.0, 0.0, 1.0);
+  vec2 p = position + 0.01 * offset;
+  gl_Position = vec4((p - center) / zoom*2.0, 0.0, 1.0);
 }
 `;
 
@@ -37,30 +42,69 @@ export default class Axes {
     readonly gl: WebGL2RenderingContext,
     readonly plane: ComplexPlane
   ) {
-    const lines = [];
-
     const l = 1.1;
     const a = 0.05;
     const tickSize = 0.025;
 
-    lines.push(-l, 0, l, 0);
-    lines.push(l, 0, l - a, a);
-    lines.push(l, 0, l - a, -a);
+    const position: number[] = [];
+    const offset: number[] = [];
+    const indices: number[] = [];
+
+    const addLine = (points: vec2[]) => {
+      const ortho = ([x1, y1]: vec2, [x2, y2]: vec2) =>
+        v2.normalized([y1 - y2, x2 - x1]);
+      if (points.length < 2) return;
+
+      for (let i = 1; i < points.length; ++i) {
+        let j = position.length / 2;
+        const a = points[i - 1];
+        const b = points[i];
+
+        const o = ortho(a, b);
+        position.push(...a, ...a, ...b, ...b);
+        offset.push(...o, ...v2.negate(o), ...o, ...v2.negate(o));
+
+        indices.push(j, j + 1, j + 3, j, j + 2, j + 3);
+      }
+    };
+
+    const lines: vec2[][] = [
+      [
+        [-l, 0],
+        [l, 0],
+      ],
+      [
+        [l - a, a],
+        [l, 0],
+        [l - a, -a],
+      ],
+    ];
 
     for (let i = -10; i <= 10; ++i) {
       const x = i / 10;
-      lines.push(x, 0, x, -tickSize);
+      lines.push([
+        [x, 0],
+        [x, -tickSize],
+      ]);
     }
 
+    lines.forEach((line) => {
+      addLine(line);
+      addLine(line.map(([x, y]) => [y, x]));
+    });
     // Add flipped version
-    for (let i = 0, s = lines.length; i < s; i += 2)
-      lines.push(lines[i + 1], lines[i]);
+    for (let i = 0; i < lines.length; i += 1) {}
 
     this.lineBuffer = twgl.createBufferInfoFromArrays(gl, {
       position: {
-        data: lines,
+        data: position,
         numComponents: 2,
       },
+      offset: {
+        data: offset,
+        numComponents: 2,
+      },
+      indices: indices,
     });
 
     console.log(this.lineBuffer);
@@ -74,10 +118,9 @@ export default class Axes {
     const gl = this.gl;
     gl.useProgram(this.program.program);
     twgl.bindFramebufferInfo(gl, fb);
-    gl.lineWidth(5);
     twgl.setUniforms(this.program, this.plane.uniforms);
     twgl.setBuffersAndAttributes(this.gl, this.program, this.lineBuffer);
-    twgl.drawBufferInfo(gl, this.lineBuffer, gl.LINES);
+    twgl.drawBufferInfo(gl, this.lineBuffer);
   }
 
   dispose() {
