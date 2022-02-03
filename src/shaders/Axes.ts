@@ -155,7 +155,6 @@ export default class Axes {
       indices: indices,
     });
 
-    console.log(this.lineBuffer);
     this.program = twgl.createProgramInfo(gl, [
       vertexLineShader,
       fragmentLineShader,

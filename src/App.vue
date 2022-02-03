@@ -1,5 +1,11 @@
 <template lang="pug">
-#container
+#container(
+  @mousemove="onMove",
+  @mouseup="onEnd",
+  @mouseleave="onEnd",
+  @touchmove="onMove",
+  @touchend="onEnd"
+)
   SidePanel(icon="bi-list", position="top right")
     form.p-3
       fieldset
@@ -36,14 +42,14 @@
 
       button.btn.btn-secondary(type="button", @click.prevent="resetView") Reset view
 
-  SidePanel(icon="bi-info", position="bottom right", :open="false")
+  SidePanel(icon="bi-info", position="bottom right", :open="true")
     .p-3
       p Test
-      p more Test
+      p A few interesting valeus for c.
       ul
-        li item
-        li item
-        li item
+        li(v-for="value in interesting")
+          a(href="#", @click.prevent="marker = value")
+            ComplexNumber(:value="value")
 
   Julia#julia(
     :colorScheme="activeScheme",
@@ -52,18 +58,27 @@
     :axes="axes"
   )
 
-  #mandelbrot-container
-    .position-relative.h-100
-      Mandelbrot#mandelbrot(
-        ref="mandelbrot",
-        colorScheme="Gray",
-        :axes="axes",
-        @click="placeMarker"
+  .mandelbrot-container
+    .mandelbrot-resize
+      div(
+        style="transform: scaleX(-1)",
+        @mousedown="(e) => (rescalePosition = [e.clientX, e.clientY])",
+        @touchstart="onStart"
       )
-      #bullseye.align-middle(:style="bullseye")
-        i.bi.bi-bullseye
-    .mandelbrot-info
-      ComplexNumber(:value="marker")
+        i.bi.bi-arrows-angle-expand
+    .mandelbrot-content
+      .position-relative.h-100
+        Mandelbrot#mandelbrot(
+          :style="{ width: mandelbrotSize + 'px', height: mandelbrotSize + 'px' }",
+          ref="mandelbrot",
+          colorScheme="Gray",
+          :axes="axes",
+          @click="placeMarker"
+        )
+        #bullseye.align-middle(:style="bullseye")
+          i.bi.bi-bullseye
+      .mandelbrot-info
+        ComplexNumber(:value="marker")
 </template>
 
 <script lang="ts">
@@ -75,6 +90,10 @@ import SidePanel from "./components/SidePanel.vue";
 import { colorSchemes } from "./util/ColorScheme";
 import downloadImage from "./util/downloadImage";
 import ComplexPlane from "./components/ComplexPlane.vue";
+
+function clamp(a: number, min: number, max: number) {
+  return a < min ? min : a > max ? max : a;
+}
 
 type CPlane = InstanceType<typeof ComplexPlane>;
 
@@ -112,13 +131,31 @@ export default defineComponent({
       isMounted: false,
       axes: false,
       loadingDownload: false,
+      interesting: [
+        [-0.124, -0.713],
+        [0, 0],
+        [-0.618, 0.0],
+        [0.226, 0.539],
+        [0.285, -0.014],
+        [-0.8, 0.156],
+      ],
+      size: [100, 100],
+      rescalePosition: null as [number, number] | null,
+      mandelbrotSizeRatio: 0.4,
+      resizeListener: () => {},
     };
   },
   mounted() {
     this.isMounted = true;
+    this.resizeListener = () => {
+      this.size = [window.innerWidth, window.innerHeight];
+    };
+    this.resizeListener();
+    window.addEventListener("resize", this.resizeListener);
   },
   unmounted() {
     this.isMounted = false;
+    window.removeEventListener("resize", this.resizeListener);
   },
   computed: {
     bullseye() {
@@ -134,8 +171,57 @@ export default defineComponent({
         top: plane.vmin * (0.5 + (cy - y) / plane.zoom) + "px",
       };
     },
+    mandelbrotSize() {
+      const t = this as any;
+      return t.mandelbrotSizeRatio * Math.min(t.size[0], t.size[1]);
+    },
+  },
+  watch: {
+    async mandelbrotSize() {
+      await this.$nextTick();
+      (
+        this.$refs.mandelbrot as any
+      ).$refs.complexPlane.$refs.webglCanvas.resize();
+    },
   },
   methods: {
+    onStart(event: MouseEvent | TouchEvent) {
+      if (event instanceof MouseEvent) {
+        event.preventDefault();
+        this.rescalePosition = [event.clientX, event.clientY];
+      } else if (event.touches.length == 1) {
+        event.preventDefault();
+        this.rescalePosition = [
+          event.touches[0].clientX,
+          event.touches[0].clientY,
+        ];
+      }
+    },
+    onMove(event: MouseEvent | TouchEvent) {
+      if (!this.rescalePosition) return;
+
+      event.preventDefault();
+
+      let p: [number, number];
+      if (event instanceof MouseEvent) p = [event.clientX, event.clientY];
+      else {
+        if (event.touches.length != 1) {
+          this.rescalePosition = null;
+          return;
+        }
+        p = [event.touches[0].clientX, event.touches[0].clientY];
+      }
+
+      const i = this.size[0] < this.size[0] ? 0 : 1;
+      const v = (this.mandelbrotSizeRatio * p[i]) / this.rescalePosition[i];
+      if (0.1 < v && v < 0.8) {
+        this.mandelbrotSizeRatio = v;
+        this.rescalePosition = p;
+      }
+    },
+    onEnd() {
+      this.rescalePosition = null;
+    },
     placeMarker(event: MouseEvent) {
       const plane = (
         (this.$refs.mandelbrot as any).$refs.complexPlane as CPlane
@@ -187,24 +273,43 @@ body,
   height: 100%;
 }
 
-#mandelbrot-container {
+.mandelbrot-container {
   position: absolute;
   top: $pad;
   left: $pad;
-  border-radius: $pad;
-  overflow: hidden;
+
+  .mandelbrot-resize {
+    position: absolute;
+    bottom: -4 * $pad;
+    right: -4 * $pad;
+    border-radius: $pad;
+    background: $panel-background;
+
+    i.bi {
+      display: block;
+      padding: $pad;
+      width: 4 * $pad;
+      font-size: 2 * $pad;
+      line-height: 2 * $pad;
+      text-align: center;
+    }
+  }
+
+  .mandelbrot-content {
+    border-radius: $pad;
+    overflow: hidden;
+  }
 
   #mandelbrot {
+    border-radius: $pad;
     opacity: 0.9;
-    width: 40vmin;
-    height: 40vmin;
-    clip-path: path("M 0 2rem L 0,75 A 5,5 0,0,1 150,75 L 200 200 z");
+    overflow: hidden;
   }
 
   .mandelbrot-info {
     position: absolute;
     background: rgba(255, 255, 255, 0.4);
-    border-radius: $pad 0 0 0;
+    border-radius: $pad 0 $pad 0;
     padding: $pad calc(3 * $pad);
     bottom: 0;
     right: 0;

@@ -48,7 +48,6 @@ export default defineComponent({
 
 .side-panel {
   $width: min(300px, 30vw);
-  $background: rgba(255, 255, 255, 0.9);
 
   position: absolute;
   width: auto;
@@ -58,7 +57,7 @@ export default defineComponent({
   .side-panel-button {
     position: absolute;
     width: 5 * $pad;
-    background: $background;
+    background: $panel-background;
     border-radius: $pad;
     font-size: 4 * $pad;
     line-height: 5 * $pad;
@@ -72,7 +71,7 @@ export default defineComponent({
 
     .side-panel-content {
       width: $width;
-      background: $background;
+      background: $panel-background;
       border-radius: $pad;
       overflow: hidden;
     }
