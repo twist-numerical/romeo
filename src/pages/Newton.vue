@@ -20,6 +20,10 @@
         input.form-check-input(type="checkbox", v-model="axes")
         .form-check-label Show axes
 
+      label.form-check.form-switch
+        input.form-check-input(type="checkbox", v-model="shadeSmooth")
+        .form-check-label Shade smooth
+
       hr
 
       button.btn.btn-link.disabled(
@@ -40,7 +44,7 @@
     .p-3
       p Test
 
-  Newton#newton(:colorScheme="activeScheme", ref="newton", :axes="axes")
+  Newton#newton(:colorScheme="activeScheme", ref="newton", :axes="axes" :shadeSmooth="shadeSmooth")
 </template>
 
 <script lang="ts">
@@ -84,6 +88,7 @@ export default defineComponent({
       isMounted: false,
       axes: false,
       loadingDownload: false,
+      shadeSmooth: false,
     };
   },
   mounted() {

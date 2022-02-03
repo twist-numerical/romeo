@@ -38,13 +38,6 @@ export default defineComponent({
       if (this.shader) this.shader.drawAxes = this.axes;
     },
   },
-  computed: {
-    uniforms() {
-      return {
-        ...ColorScheme.schemes[this.colorScheme].uniforms,
-      };
-    },
-  },
   methods: {
     onContext(gl: WebGL2RenderingContext) {
       this.shader = new MandelbrotShader(

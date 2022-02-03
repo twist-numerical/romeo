@@ -14,6 +14,8 @@ const srcShader =
 
 out vec4 oColor;
 
+uniform bool uShadeSmooth;
+
 vec2 cmul(vec2 a, vec2 b) {
   return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
 }
@@ -45,7 +47,7 @@ void main() {
   
   float steps = -1.0;
   for(int i = 0; i < 100; ++i) {
-    vec2 fc = f(c);
+    fc = f(c);
     if(cmod(fc) < 1e-6) {
       steps = float(i);
       break;
@@ -57,6 +59,8 @@ void main() {
     oColor= vec4(colorScheme(-1.), 1.0);
   else {
     vec3 col = colorScheme(abs(dot(c, vec2(1.1e3, 1.2e3))));
+    if(uShadeSmooth)
+      steps += clamp(cmod(fc)*1e6, 0., 1.);
     col *= exp(-pow(0.04*float(steps), 2.0));
     oColor= vec4(col, 1.0);
   }
@@ -66,6 +70,7 @@ export default class Newton {
   shader: SquareShader;
   drawAxes: boolean = true;
   axes: Axes;
+  shadeSmooth: boolean = false;
 
   constructor(
     readonly gl: WebGL2RenderingContext,
@@ -82,6 +87,9 @@ export default class Newton {
     shader.useProgram();
     twgl.setUniforms(shader.programInfo, colorScheme.uniforms);
     twgl.setUniforms(shader.programInfo, this.plane.uniforms);
+    twgl.setUniforms(shader.programInfo, {
+      uShadeSmooth: this.shadeSmooth,
+    });
     shader.draw();
 
     if (this.drawAxes) this.axes.render(fb, colorScheme);

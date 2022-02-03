@@ -27,6 +27,10 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    shadeSmooth: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -37,12 +41,8 @@ export default defineComponent({
     axes() {
       if (this.shader) this.shader.drawAxes = this.axes;
     },
-  },
-  computed: {
-    uniforms() {
-      return {
-        ...ColorScheme.schemes[this.colorScheme].uniforms,
-      };
+    shadeSmooth() {
+      if (this.shader) this.shader.shadeSmooth = this.shadeSmooth;
     },
   },
   methods: {
@@ -52,6 +52,7 @@ export default defineComponent({
         (this.$refs.complexPlane as CPlane).complexPlane as any
       );
       this.shader.drawAxes = this.axes;
+      this.shader.shadeSmooth = this.shadeSmooth;
     },
     onRender(fb: twgl.FramebufferInfo | null) {
       if (this.shader)
