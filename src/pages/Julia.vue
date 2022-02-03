@@ -83,13 +83,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Julia from "./components/Julia.vue";
-import Mandelbrot from "./components/Mandelbrot.vue";
-import ComplexNumber from "./components/ComplexNumber.vue";
-import SidePanel from "./components/SidePanel.vue";
-import { colorSchemes } from "./util/ColorScheme";
-import downloadImage from "./util/downloadImage";
-import ComplexPlane from "./components/ComplexPlane.vue";
+import Julia from "../components/Julia.vue";
+import Mandelbrot from "../components/Mandelbrot.vue";
+import ComplexNumber from "../components/ComplexNumber.vue";
+import SidePanel from "../components/SidePanel.vue";
+import { colorSchemes } from "../util/ColorScheme";
+import downloadImage from "../util/downloadImage";
+import ComplexPlane from "../components/ComplexPlane.vue";
 
 function clamp(a: number, min: number, max: number) {
   return a < min ? min : a > max ? max : a;
@@ -262,7 +262,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import "./style/vars.scss";
+@import "../style/vars.scss";
 
 html,
 body,
