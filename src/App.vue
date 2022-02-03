@@ -45,7 +45,7 @@
   SidePanel(icon="bi-info", position="bottom right", :open="true")
     .p-3
       p Test
-      p A few interesting valeus for c.
+      p A few interesting values for c.
       ul
         li(v-for="value in interesting")
           a(href="#", @click.prevent="marker = value")
