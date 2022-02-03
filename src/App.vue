@@ -16,6 +16,12 @@
 
       hr 
 
+      label.form-check.form-switch
+        input.form-check-input(type="checkbox", v-model="axes")
+        .form-check-label Show axes
+
+      hr
+
       button.btn.btn-link.disabled(
         v-if="loadingDownload",
         type="button",
@@ -39,13 +45,19 @@
         li item
         li item
 
-  Julia#julia(:colorScheme="activeScheme", ref="julia", :c="marker")
+  Julia#julia(
+    :colorScheme="activeScheme",
+    ref="julia",
+    :c="marker",
+    :axes="axes"
+  )
 
   #mandelbrot-container
     .position-relative.h-100
       Mandelbrot#mandelbrot(
         ref="mandelbrot",
         colorScheme="Gray",
+        :axes="axes",
         @click="placeMarker"
       )
       #bullseye.align-middle(:style="bullseye")
@@ -98,6 +110,7 @@ export default defineComponent({
       activeScheme: "UGent",
       marker: [-0.124, -0.713],
       isMounted: false,
+      axes: false,
       loadingDownload: false,
     };
   },

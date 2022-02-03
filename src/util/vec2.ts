@@ -28,3 +28,9 @@ export function sum(...a: vec2[]): vec2 {
 export function negate(a: vec2): vec2 {
   return [-a[0], -a[1]];
 }
+
+export function rotate(a: vec2, angle: number): vec2 {
+  const sa = Math.sin(angle);
+  const ca = Math.cos(angle);
+  return [ca * a[0] + sa * a[1], -sa * a[0] + ca * a[1]];
+}

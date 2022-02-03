@@ -24,14 +24,17 @@ function parseColor(color: string | Color): Color {
 export default class ColorScheme {
   readonly steps: Color[];
   readonly negative: Color;
+  readonly axes: Color;
   private _uniformCache: number[] | undefined = undefined;
 
   constructor(
     _steps: (string | Color)[],
-    _negative: string | Color = [0, 0, 0]
+    _negative: string | Color = [0, 0, 0],
+    _axes: string | Color = [1, 1, 1]
   ) {
-    this.negative = parseColor(_negative);
     this.steps = _steps.map(parseColor);
+    this.negative = parseColor(_negative);
+    this.axes = parseColor(_axes);
   }
 
   get(v: number): Color {
@@ -87,7 +90,9 @@ colorSchemes["Rainbow"] = new ColorScheme([
   "7f00ff",
   "ff007f",
 ]);
-colorSchemes["Gray"] = new ColorScheme(["FFFFFF", "999999"]);
+colorSchemes["Gray"] = new ColorScheme(["FFFFFF", "999999"],
+"000000",
+"777777");
 
 colorSchemes["Pink"] = new ColorScheme(
   ["91589C", "B26AA6", "C87DA2", "D28AC6", "D198DB"],

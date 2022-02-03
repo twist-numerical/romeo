@@ -79,6 +79,7 @@ export default class Julia {
   stepsExecuted = 0;
   c: [number, number] = [0, 0];
   axes: Axes;
+  drawAxes: boolean = true;
 
   constructor(
     readonly gl: WebGL2RenderingContext,
@@ -156,7 +157,7 @@ export default class Julia {
     });
     shader.draw();
 
-    this.axes.render(fb);
+    if (this.drawAxes) this.axes.render(fb, colorScheme);
   }
 
   dispose() {

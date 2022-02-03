@@ -1,5 +1,10 @@
 <template lang="pug">
-ComplexPlane(ref="complexPlane", @render="onRender", @context="onContext")
+ComplexPlane(
+  ref="complexPlane",
+  :update="[axes]",
+  @render="onRender",
+  @context="onContext"
+)
 </template>
 
 <script lang="ts">
@@ -18,11 +23,20 @@ export default defineComponent({
       type: String,
       default: "rainbow",
     },
+    axes: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
       shader: null as MandelbrotShader | null,
     };
+  },
+  watch: {
+    axes() {
+      if (this.shader) this.shader.drawAxes = this.axes;
+    },
   },
   computed: {
     uniforms() {
@@ -37,6 +51,7 @@ export default defineComponent({
         gl,
         (this.$refs.complexPlane as CPlane).complexPlane as any
       );
+      this.shader.drawAxes = this.axes;
     },
     onRender(fb: twgl.FramebufferInfo | null) {
       if (this.shader)

@@ -1,7 +1,7 @@
 <template lang="pug">
 ComplexPlane(
   ref="complexPlane",
-  :update="[c, colorScheme, shouldUpdate]",
+  :update="[c, colorScheme, shouldUpdate, axes]",
   @resize="onResize",
   @context="initGL",
   @render="onRender",
@@ -31,6 +31,10 @@ export default defineComponent({
       type: Array as unknown as PropType<[number, number]>,
       default: [-0.8, 0.156],
     },
+    axes: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -40,6 +44,9 @@ export default defineComponent({
     };
   },
   watch: {
+    axes() {
+      if (this.shader) this.shader.drawAxes = this.axes;
+    },
     c() {
       if (this.shader) this.shader.c = this.c;
       this.viewChanged = true;
@@ -57,6 +64,7 @@ export default defineComponent({
         (this.$refs.complexPlane as CPlane).complexPlane
       );
       this.shader.c = this.c;
+      this.shader.drawAxes = this.axes;
     },
 
     advance(calculateFull: boolean) {

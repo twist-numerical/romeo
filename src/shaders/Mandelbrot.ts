@@ -2,6 +2,7 @@ import * as twgl from "twgl.js";
 import ColorScheme from "../util/ColorScheme";
 import ComplexPlane from "./ComplexPlane";
 import SquareShader from "@/util/SquareShader";
+import Axes from "./Axes";
 
 const MAX_STEPS = 800;
 
@@ -41,14 +42,17 @@ void main() {
   oColor= vec4(color(steps), 1.0);
 }`;
 
-export default class Julia {
+export default class Mandelbrot {
   shader: SquareShader;
+  drawAxes: boolean = true;
+  axes: Axes;
 
   constructor(
     readonly gl: WebGL2RenderingContext,
     readonly plane: ComplexPlane
   ) {
     this.shader = new SquareShader(gl, srcShader);
+    this.axes = new Axes(gl, plane);
   }
 
   render(fb: twgl.FramebufferInfo | null, colorScheme: ColorScheme) {
@@ -59,6 +63,8 @@ export default class Julia {
     twgl.setUniforms(shader.programInfo, colorScheme.uniforms);
     twgl.setUniforms(shader.programInfo, this.plane.uniforms);
     shader.draw();
+
+    if (this.drawAxes) this.axes.render(fb, colorScheme);
   }
 
   dispose() {
