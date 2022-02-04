@@ -16,18 +16,27 @@ void main() {
   vPixel = pixel;
 }`;
 
+function getProgram(gl: WebGL2RenderingContext, fragmentShader: string) {
+  return twgl.createProgramInfo(gl, [
+    vertexShader,
+    header + "in vec2 vPixel;" + fragmentShader,
+  ]);
+}
+
 export default class SquareShader {
   private buffers: twgl.BufferInfo;
-  readonly programInfo: twgl.ProgramInfo;
+  programInfo: twgl.ProgramInfo;
 
   constructor(private gl: WebGL2RenderingContext, fragmentShader: string) {
     this.buffers = twgl.createBufferInfoFromArrays(gl, {
       pixel: { data: [0, 0, 1, 0, 0, 1, 1, 1], numComponents: 2 },
     });
-    this.programInfo = twgl.createProgramInfo(gl, [
-      vertexShader,
-      header + "in vec2 vPixel;" + fragmentShader,
-    ]);
+    this.programInfo = getProgram(gl, fragmentShader);
+  }
+
+  setProgram(fragmentShader: string) {
+    this.gl.deleteProgram(this.programInfo.program);
+    this.programInfo = getProgram(this.gl, fragmentShader);
   }
 
   useProgram() {
@@ -40,6 +49,7 @@ export default class SquareShader {
   }
 
   dispose() {
+    this.gl.deleteProgram(this.programInfo.program);
     deleteBuffer(this.gl, this.buffers);
   }
 }

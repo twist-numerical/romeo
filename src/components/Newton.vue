@@ -1,7 +1,7 @@
 <template lang="pug">
 ComplexPlane(
   ref="complexPlane",
-  :update="[axes]",
+  :update="[axes, shadeSmooth, f]",
   @render="onRender",
   @context="onContext"
 )
@@ -31,6 +31,10 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    f: {
+      type: String,
+      default: true,
+    },
   },
   data() {
     return {
@@ -44,6 +48,7 @@ export default defineComponent({
     shadeSmooth() {
       if (this.shader) this.shader.shadeSmooth = this.shadeSmooth;
     },
+    f: "updateF",
   },
   methods: {
     onContext(gl: WebGL2RenderingContext) {
@@ -53,6 +58,7 @@ export default defineComponent({
       );
       this.shader.drawAxes = this.axes;
       this.shader.shadeSmooth = this.shadeSmooth;
+      this.updateF();
     },
     onRender(fb: twgl.FramebufferInfo | null) {
       if (this.shader)
@@ -60,6 +66,14 @@ export default defineComponent({
     },
     resetView() {
       (this.$refs.complexPlane as any).resetView();
+    },
+    updateF() {
+      if (this.shader) {
+        const f = this.f
+          ? this.f
+          : "vec2 f(vec2 z) { return z; } vec2 df(vec2 z) { return vec2(1.,0.); }";
+        this.shader.setF(f);
+      }
     },
   },
 });

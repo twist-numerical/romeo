@@ -56,6 +56,7 @@ export default defineComponent({
   props: {
     shader: { type: String },
     update: { default: () => [] },
+    moveable: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -82,6 +83,7 @@ export default defineComponent({
       this.complexPlane.size = [width, height];
     },
     onMousedown(event: MouseEvent) {
+      if(!this.moveable) return;
       this.touchPosition = {
         position: [event.clientX, event.clientY],
         distance: -1,
@@ -104,6 +106,7 @@ export default defineComponent({
       this.afterMove = true;
     },
     onTouchstart(event: TouchEvent) {
+      if(!this.moveable) return;
       if (event.touches.length == 1 || event.touches.length == 2) {
         this.touchPosition = {
           position: averageTouchPosition(event.touches),

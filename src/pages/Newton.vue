@@ -1,18 +1,28 @@
 <template lang="pug">
 #container
   SidePanel(icon="bi-list", position="top right")
-    form.p-3
-      fieldset
-        legend Romeo
-        .form-label Colour scheme
-        .ps-3
-          label.form-check(v-for="scheme of colorSchemes")
-            input.form-check-input(
-              type="radio",
-              v-model="activeScheme",
-              :value="scheme"
-            )
-            span.form-check-label {{ scheme }}
+    form.p-3(@submit.prevent)
+      h3 Newton's method
+
+      .input-group
+        span.input-group-text f(z) =
+        input.form-control(
+          type="text",
+          :value="formula",
+          @change="(e) => (formula = e.target.value)"
+        )
+
+      hr 
+
+      .form-label Colour scheme
+      .ps-3
+        label.form-check(v-for="scheme of colorSchemes")
+          input.form-check-input(
+            type="radio",
+            v-model="activeScheme",
+            :value="scheme"
+          )
+          span.form-check-label {{ scheme }}
 
       hr 
 
@@ -44,7 +54,13 @@
     .p-3
       p Test
 
-  Newton#newton(:colorScheme="activeScheme", ref="newton", :axes="axes" :shadeSmooth="shadeSmooth")
+  Newton#newton(
+    :colorScheme="activeScheme",
+    ref="newton",
+    :f="shader",
+    :axes="axes",
+    :shadeSmooth="shadeSmooth"
+  )
 </template>
 
 <script lang="ts">
@@ -54,6 +70,8 @@ import ComplexNumber from "../components/ComplexNumber.vue";
 import SidePanel from "../components/SidePanel.vue";
 import { colorSchemes } from "../util/ColorScheme";
 import downloadImage from "../util/downloadImage";
+import * as parser from "../util/complexParser";
+import * as math from "mathjs";
 
 const getDownloadSize = (() => {
   const w = window as any;
@@ -85,17 +103,32 @@ export default defineComponent({
       colorSchemes: Object.keys(colorSchemes),
       activeScheme: "UGent",
       marker: [-0.124, -0.713],
-      isMounted: false,
       axes: false,
       loadingDownload: false,
       shadeSmooth: false,
+      formula: "z^5 - 1",
     };
   },
-  mounted() {
-    this.isMounted = true;
-  },
-  unmounted() {
-    this.isMounted = false;
+  computed: {
+    shader() {
+      try {
+        const tree = math.parse((this as any).formula);
+
+        return `
+        ${parser.shaderHeader}
+        vec2 f(vec2 z) {
+          return (${parser.compile(tree, ["z"])});
+        }
+
+        vec2 df(vec2 z) {
+          return (${parser.compile(math.derivative(tree, "z"), ["z"])});
+        }
+        `;
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    },
   },
   methods: {
     resetView() {
