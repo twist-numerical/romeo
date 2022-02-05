@@ -4,17 +4,18 @@ import ComplexPlane from "./ComplexPlane";
 import SquareShader from "@/util/SquareShader";
 import Axes from "./Axes";
 
-const MAX_STEPS = 800;
+const MAX_STEPS = 200;
 
 const srcShader = `
-#define MAXSTEPS ${MAX_STEPS}
-#define log10 ${Math.log(10)}
+#define newton_MAXSTEPS ${MAX_STEPS}
+#define newton_log10 ${Math.log(10)}
+#define newton_pi 3.14159265358
 
 out vec4 oColor;
 
 uniform bool uShadeSmooth;
 
-vec2 nr_cdiv(vec2 a, vec2 b) {
+vec2 newton_cdiv(vec2 a, vec2 b) {
   float n = dot(b, b);
   return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / n;
 }
@@ -22,23 +23,30 @@ vec2 nr_cdiv(vec2 a, vec2 b) {
 void main() {
   vec2 c = point();
   vec2 fc;
+  vec2 dc;
   
   float steps = -1.0;
-  for(int i = 0; i < 100; ++i) {
+  for(int i = 0; i < newton_MAXSTEPS; ++i) {
     fc = f(c);
-    if(length(fc) < 1e-6) {
+    dc = newton_cdiv(fc, df(c));
+    if(length(fc) < 1e-2 && length(dc) < 1e-6) {
       steps = float(i);
       break;
     }
-    c -= nr_cdiv(fc, df(c));
+    c -= dc;
   }
 
   if(steps < 0.0)
     oColor= vec4(colorScheme(-1.), 1.0);
   else {
-    vec3 col = colorScheme(abs(dot(c, vec2(1.1e3, 1.2e3))));
-    if(uShadeSmooth)
-      steps += clamp(length(fc)*1e6, 0., 1.);
+    float l = length(c);
+    float angle = (1. + atan(c.y, c.x)/newton_pi) * 0.5 * 659.0;
+    vec3 col = colorScheme(l*432.23 + (l < 1e-3 ? 0.0 : angle));
+    if(uShadeSmooth) {
+      float ldc = length(dc);
+      float v = 1. + (log(ldc)/newton_log10 + 6.)/6.;
+      steps += clamp(v, 0., 1.);
+    }
     col *= exp(-pow(0.04*float(steps), 2.0));
     oColor= vec4(col, 1.0);
   }
