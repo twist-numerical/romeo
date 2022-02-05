@@ -56,12 +56,14 @@ export default class ColorScheme {
     return {
       uColorScheme: this._uniformCache,
       uColorSchemeNegative: this.negative,
+      uColorSchemeAxes: this.axes,
     };
   }
 
   static glslCode: string = (() => {
     let code = `uniform vec3 uColorScheme[${interpolationSteps + 1}];`;
     code += `uniform vec3 uColorSchemeNegative;`;
+    code += `uniform vec3 uColorSchemeAxes;`;
     code += `vec3 colorScheme(float v) {`;
     code += `if(v < 0.0) return uColorSchemeNegative;`;
     code += `v = fract(v) * float(${interpolationSteps});`;
@@ -90,9 +92,11 @@ colorSchemes["Rainbow"] = new ColorScheme([
   "7f00ff",
   "ff007f",
 ]);
-colorSchemes["Gray"] = new ColorScheme(["FFFFFF", "999999"],
-"000000",
-"777777");
+colorSchemes["Gray"] = new ColorScheme(
+  ["FFFFFF", "999999"],
+  "000000",
+  "777777"
+);
 
 colorSchemes["Pink"] = new ColorScheme(
   ["91589C", "B26AA6", "C87DA2", "D28AC6", "D198DB"],

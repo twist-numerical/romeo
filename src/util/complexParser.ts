@@ -6,14 +6,14 @@ const binary_functions: { [f: string]: string } = {
   multiply: "return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x);",
   divide:
     "return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / dot(b, b);",
-  pow: "return c_exp(c_multiply(b, c_ln(a)));",
+  pow: "return c_exp(c_multiply(b, c_log(a)));",
 };
 
 const unary_functions: { [f: string]: string } = {
   inverse: "return vec2(a.x, -a.y)/dot(a, a);",
   unaryMinus: "return -a;",
   multiply_i: "return vec2(-a.y, a.x);",
-  ln: "return vec2(log(length(a)), atan(a.y, a.x));",
+  log: "return vec2(log(length(a)), atan(a.y, a.x));",
   exp: "return exp(a.x)*vec2(cos(a.y), sin(a.y));",
   sinh: "vec2 epa = c_exp(a); return .5 * (epa - c_inverse(epa));",
   cosh: "vec2 epa = c_exp(a); return .5 * (epa + c_inverse(epa));",
@@ -21,6 +21,13 @@ const unary_functions: { [f: string]: string } = {
   sin: "return -c_multiply_i(c_sinh(c_multiply_i(a)));",
   cos: "return c_cosh(c_multiply_i(a));",
   tan: "return -c_multiply_i(c_tanh(c_multiply_i(a)));",
+};
+
+const symbols: { [symbol: string]: string } = {
+  i: "vec2(0.,1.)",
+  e: "vec2(2.7182818284,0.)",
+  pi: "vec2(3.14159265358,0.)",
+  phi: "vec2(1.6180339887, 0.)",
 };
 
 [
@@ -46,11 +53,17 @@ Object.entries(binary_functions).forEach(
 complex_functions.divide.order = 100;
 complex_functions.multiply.order = 100;
 complex_functions.multiply_i.order = 100;
-complex_functions.ln.order = 50;
+complex_functions.log.order = 100;
+complex_functions.exp.order = 100;
+complex_functions.inverse.order = 100;
+["sin", "cos", "tan"].forEach((f) => {
+  complex_functions[f + "h"].order = 20;
+  complex_functions[f].order = 10;
+});
 
 function compileTree(tree: math.MathNode, vars: string[]): string {
   if (tree instanceof math.SymbolNode) {
-    if (tree.name == "i") return "vec2(0.,1.)";
+    if (symbols[tree.name] !== undefined) return symbols[tree.name];
     if (vars.indexOf(tree.name) == -1)
       throw new SyntaxError("Invalid symbol name: '" + tree.name + "'");
     return tree.name;

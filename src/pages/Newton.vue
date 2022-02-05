@@ -8,9 +8,11 @@
         span.input-group-text f(z) =
         input.form-control(
           type="text",
+          :class="{ 'is-invalid': !!errorMessage }",
           :value="formula",
           @change="(e) => (formula = e.target.value)"
         )
+        .invalid-feedback {{ errorMessage }}
 
       hr 
 
@@ -34,6 +36,10 @@
         input.form-check-input(type="checkbox", v-model="shadeSmooth")
         .form-check-label Shade smooth
 
+      label.form-check.form-switch
+        input.form-check-input(type="checkbox", v-model="showRoots")
+        .form-check-label Show roots
+
       hr
 
       button.btn.btn-link.disabled(
@@ -52,14 +58,18 @@
 
   SidePanel(icon="bi-info", position="bottom right", :open="true")
     .p-3
-      p Test
+      ul
+        li(v-for="value in interesting")
+          a(href="#", @click.prevent="formula = value")
+            | f(z) = {{ value }}
 
   Newton#newton(
     :colorScheme="activeScheme",
     ref="newton",
     :f="shader",
     :axes="axes",
-    :shadeSmooth="shadeSmooth"
+    :shadeSmooth="shadeSmooth",
+    :showRoots="showRoots"
   )
 </template>
 
@@ -106,28 +116,38 @@ export default defineComponent({
       axes: false,
       loadingDownload: false,
       shadeSmooth: false,
+      showRoots: false,
       formula: "z^5 - 1",
+      interesting: ["z^5 - 1", "cos(z)", "z^3 - 1"],
+      shader: null as null | string,
+      errorMessage: "",
     };
   },
-  computed: {
-    shader() {
-      try {
-        const tree = math.parse((this as any).formula);
+  watch: {
+    formula: {
+      immediate: true,
+      handler(formula: string) {
+        try {
+          const tree = math.parse(formula);
 
-        return `
-        ${parser.shaderHeader}
-        vec2 f(vec2 z) {
-          return (${parser.compile(tree, ["z"])});
-        }
+          this.shader = `
+          ${parser.shaderHeader}
+          vec2 f(vec2 z) {
+            return (${parser.compile(tree, ["z"])});
+          }
 
-        vec2 df(vec2 z) {
-          return (${parser.compile(math.derivative(tree, "z"), ["z"])});
-        }
+          vec2 df(vec2 z) {
+            return (${parser.compile(math.derivative(tree, "z"), ["z"])});
+          }
         `;
-      } catch (e) {
-        console.log(e);
-        return null;
-      }
+          this.errorMessage = "";
+        } catch (e) {
+          if (e instanceof Error) {
+            this.errorMessage = e.message;
+            console.warn(e);
+          } else throw e;
+        }
+      },
     },
   },
   methods: {

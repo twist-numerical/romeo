@@ -1,7 +1,7 @@
 <template lang="pug">
 ComplexPlane(
   ref="complexPlane",
-  :update="[axes, shadeSmooth, f]",
+  :update="[axes, shadeSmooth, f, showRoots]",
   @render="onRender",
   @context="onContext"
 )
@@ -31,6 +31,10 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    showRoots: {
+      type: Boolean,
+      default: true,
+    },
     f: {
       type: String,
       default: true,
@@ -48,6 +52,9 @@ export default defineComponent({
     shadeSmooth() {
       if (this.shader) this.shader.shadeSmooth = this.shadeSmooth;
     },
+    showRoots() {
+      if (this.shader) this.shader.showRoots = this.showRoots;
+    },
     f: "updateF",
   },
   methods: {
@@ -58,6 +65,7 @@ export default defineComponent({
       );
       this.shader.drawAxes = this.axes;
       this.shader.shadeSmooth = this.shadeSmooth;
+      this.shader.showRoots = this.showRoots;
       this.updateF();
     },
     onRender(fb: twgl.FramebufferInfo | null) {
