@@ -29,6 +29,10 @@ bool newton_iswrong(vec2 v) {
   return any(isnan(v)) || any(isinf(v));
 }
 
+float newton_easeinout(float x) {
+  return x < 0.5 ? 4.0 * x * x * x : 1.0 - 0.5 * newton_cube(2.0 - 2.0*x);
+}
+
 void main() {
   vec2 p = point();
   vec2 c = p;
@@ -63,7 +67,7 @@ void main() {
     if(uShowRoots) {
       float d = distance(c, p) / 0.06;
       if(d < 1.0) {
-        col = mix(col, uColorSchemeAxes, d < 0.5 ? 1.0 - 4.0*newton_cube(d) : 0.5 * newton_cube(2.0 - 2.0 * d));
+        col = mix(uColorSchemeAxes, col, newton_easeinout(d));
       }
     }
 

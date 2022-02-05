@@ -12,7 +12,7 @@ ComplexPlane(
 <script lang="ts">
 import * as twgl from "twgl.js";
 import { defineComponent, PropType } from "vue";
-import ComplexPlane, { complexPlaneShaderHeader } from "./ComplexPlane.vue";
+import ComplexPlane from "./ComplexPlane.vue";
 import ColorScheme from "../util/ColorScheme";
 import JuliaShader from "../shaders/Julia";
 
@@ -25,7 +25,7 @@ export default defineComponent({
   props: {
     colorScheme: {
       type: String,
-      default: "rainbow",
+      default: ColorScheme.randomScheme().name,
     },
     c: {
       type: Array as unknown as PropType<[number, number]>,
@@ -33,7 +33,11 @@ export default defineComponent({
     },
     axes: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    dynamic: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -72,7 +76,7 @@ export default defineComponent({
 
       if (calculateFull) {
         while (this.shader.stepsExecuted < MAX_STEPS) this.shader.advance();
-      } else {
+      } else if (this.dynamic) {
         const gl = this.shader.gl;
         gl.flush();
         gl.finish();
@@ -91,6 +95,8 @@ export default defineComponent({
           gl.finish();
         }
         if (this.shader.stepsExecuted < MAX_STEPS) this.shouldUpdate++;
+      } else {
+        this.shader.advance();
       }
     },
     onRender(fb: twgl.FramebufferInfo | null) {

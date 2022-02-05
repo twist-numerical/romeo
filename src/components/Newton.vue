@@ -83,6 +83,11 @@ export default defineComponent({
         this.shader.setF(f);
       }
     },
+    async generateImage(size: number): Promise<ImageData> {
+      return await (
+        (this.$refs.complexPlane as CPlane).$refs.webglCanvas as any
+      ).generateImage(size);
+    },
   },
 });
 </script>

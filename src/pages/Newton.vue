@@ -112,7 +112,6 @@ export default defineComponent({
     return {
       colorSchemes: Object.keys(colorSchemes),
       activeScheme: "UGent",
-      marker: [-0.124, -0.713],
       axes: false,
       loadingDownload: false,
       shadeSmooth: false,
@@ -158,14 +157,11 @@ export default defineComponent({
       try {
         this.loadingDownload = true;
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
-        const image: ImageData = await (this.$refs.julia as any).generateImage(
+        const image: ImageData = await (this.$refs.newton as any).generateImage(
           getDownloadSize()
         );
 
-        let filename = "julia." + this.marker[0].toFixed(8);
-        const b = this.marker[1].toFixed(8) + "i";
-        if (!b.startsWith("-")) filename += "+";
-        filename += b;
+        let filename = "newton";
 
         downloadImage(image, filename);
       } finally {

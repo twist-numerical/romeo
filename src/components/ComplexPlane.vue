@@ -16,7 +16,7 @@ WebGLCanvas(
 
 <script lang="ts">
 import * as twgl from "twgl.js";
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import WebGLCanvas from "./WebGLCanvas.vue";
 import ComplexPlane from "../shaders/ComplexPlane";
 
@@ -57,10 +57,18 @@ export default defineComponent({
     shader: { type: String },
     update: { default: () => [] },
     moveable: { type: Boolean, default: true },
+    center: {
+      type: Array as unknown as PropType<[number, number]>,
+      default: () => [0, 0],
+    },
+    zoom: { type: Number, default: 3 },
   },
   data() {
+    const cp = new ComplexPlane();
+    cp.center = this.center;
+    cp.zoom = this.zoom;
     return {
-      complexPlane: new ComplexPlane(),
+      complexPlane: cp,
       touchPosition: null as {
         position: vec2;
         distance: number;
@@ -77,13 +85,19 @@ export default defineComponent({
         this.$emit("viewChanged");
       },
     },
+    center() {
+      this.complexPlane.center = this.center;
+    },
+    zoom() {
+      this.complexPlane.zoom = this.zoom;
+    },
   },
   methods: {
     onResize(width: number, height: number) {
       this.complexPlane.size = [width, height];
     },
     onMousedown(event: MouseEvent) {
-      if(!this.moveable) return;
+      if (!this.moveable) return;
       this.touchPosition = {
         position: [event.clientX, event.clientY],
         distance: -1,
@@ -106,7 +120,7 @@ export default defineComponent({
       this.afterMove = true;
     },
     onTouchstart(event: TouchEvent) {
-      if(!this.moveable) return;
+      if (!this.moveable) return;
       if (event.touches.length == 1 || event.touches.length == 2) {
         this.touchPosition = {
           position: averageTouchPosition(event.touches),

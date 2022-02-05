@@ -28,6 +28,7 @@ export default class ColorScheme {
   private _uniformCache: number[] | undefined = undefined;
 
   constructor(
+    readonly name: string,
     _steps: (string | Color)[],
     _negative: string | Color = [0, 0, 0],
     _axes: string | Color = [1, 1, 1]
@@ -74,9 +75,24 @@ export default class ColorScheme {
   })();
 
   static schemes = colorSchemes;
+
+  static randomScheme() {
+    const keys = Object.keys(this.schemes);
+    return this.schemes[keys[Math.floor(Math.random() * keys.length)]];
+  }
 }
 
-colorSchemes["UGent"] = new ColorScheme([
+type ColorArg = Color | string;
+function createScheme(
+  name: string,
+  colors: ColorArg[],
+  negative?: ColorArg,
+  axes?: ColorArg
+) {
+  colorSchemes[name] = new ColorScheme(name, colors, negative, axes);
+}
+
+createScheme("UGent", [
   "1E64C8",
   "71A860",
   "FFD200",
@@ -84,7 +100,7 @@ colorSchemes["UGent"] = new ColorScheme([
   "DC4E28",
   "825491",
 ]);
-colorSchemes["Rainbow"] = new ColorScheme([
+createScheme("Rainbow", [
   "ff7f00",
   "7fff00",
   "00ff7f",
@@ -92,18 +108,14 @@ colorSchemes["Rainbow"] = new ColorScheme([
   "7f00ff",
   "ff007f",
 ]);
-colorSchemes["Gray"] = new ColorScheme(
-  ["FFFFFF", "999999"],
-  "000000",
-  "777777"
-);
-
-colorSchemes["Pink"] = new ColorScheme(
+createScheme("Gray", ["FFFFFF", "999999"], "000000", "777777");
+createScheme(
+  "Pink",
   ["91589C", "B26AA6", "C87DA2", "D28AC6", "D198DB"],
   "FF7BE2"
 );
-
-colorSchemes["Hot and cold"] = new ColorScheme(
+createScheme(
+  "Hot and cold",
   [
     [0.2298057, 0.298717966, 0.753683153],
     [0.865395197, 0.86541021, 0.865395561],

@@ -21,6 +21,8 @@ const unary_functions: { [f: string]: string } = {
   sin: "return -c_multiply_i(c_sinh(c_multiply_i(a)));",
   cos: "return c_cosh(c_multiply_i(a));",
   tan: "return -c_multiply_i(c_tanh(c_multiply_i(a)));",
+  sqrt: "return c_exp(0.5*c_log(a));",
+  cbrt: "return c_exp(0.33333333333*c_log(a));",
 };
 
 const symbols: { [symbol: string]: string } = {

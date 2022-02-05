@@ -55,7 +55,8 @@
     :colorScheme="activeScheme",
     ref="julia",
     :c="marker",
-    :axes="axes"
+    :axes="axes",
+    :dynamic="true"
   )
 
   .mandelbrot-container
