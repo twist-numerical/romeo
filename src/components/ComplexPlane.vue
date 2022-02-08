@@ -168,6 +168,7 @@ export default defineComponent({
       }
     },
     onWheel(event: WheelEvent) {
+      if (!this.moveable) return;
       if (event.deltaY == 0) return;
 
       event.preventDefault();
