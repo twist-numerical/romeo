@@ -125,21 +125,22 @@ export default defineComponent({
     ComplexNumber,
   },
   data() {
+    const interesting = [
+      [-0.124, -0.713],
+      [0, 0],
+      [-0.618, 0.0],
+      [0.226, -0.539],
+      [0.285, -0.014],
+      [-0.8, 0.156],
+    ];
     return {
       colorSchemes: Object.keys(colorSchemes),
-      activeScheme: "UGent",
-      marker: [-0.124, -0.713],
+      activeScheme: "Soft rainbow",
+      marker: interesting[0],
       isMounted: false,
       axes: false,
       loadingDownload: false,
-      interesting: [
-        [-0.124, -0.713],
-        [0, 0],
-        [-0.618, 0.0],
-        [0.226, 0.539],
-        [0.285, -0.014],
-        [-0.8, 0.156],
-      ],
+      interesting: interesting,
       size: [100, 100],
       rescalePosition: null as [number, number] | null,
       mandelbrotSizeRatio: 0.4,

@@ -111,7 +111,7 @@ createScheme("UGent", [
   "#DC4E28",
   "#825491",
 ]);
-createScheme("Rainbow", [
+createScheme("Fluo", [
   "#ff7f00",
   "#7fff00",
   "#00ff7f",
@@ -120,11 +120,7 @@ createScheme("Rainbow", [
   "#ff007f",
 ]);
 createScheme("Gray", ["#FFFFFF", "#999999"], "#000000", "#777777");
-createScheme(
-  "Pink",
-  ["#91589C", "#B26AA6", "#C87DA2", "#D28AC6", "#D198DB"],
-  "#FF7BE2"
-);
+
 createScheme(
   "Hot and cold",
   bidirectional([
@@ -135,7 +131,43 @@ createScheme(
   "#000000"
 );
 createScheme(
-  "Winter and spring",
+  "Soft rainbow",
+  ([
+    "#2EC7F1",
+    "#8669B4",
+    "#E43140",
+    "#F0D43A",
+    "#34C74C",
+  ]),
+  "#000000"
+);
+createScheme(
+  "Dracula",
+  bidirectional([
+    "#384259",
+    "#F73859",
+    "#7AC7C4",
+    "#C4EDDE",
+  ]),
+  "#000000"
+);
+createScheme(
+  "Candy",
+  bidirectional([
+    "#6092CA",
+    "#3FC1C9",
+    "#FCE38A",
+    "#FC5185"
+  ]),
+  "#000000"
+);
+createScheme(
+  "Christmas",
+  bidirectional(["#FA4659", "#FEFFE4", "#A3DE83", "#2EB872"]),
+  "#413131"
+);
+createScheme(
+  "Autumn",
   [
     "#306BC5",
     "#14a6a5",
