@@ -1,8 +1,6 @@
-import * as twgl from "twgl.js";
-
 export type Color = [number, number, number];
 
-const interpolationSteps = 12;
+const maxInterpolationSteps = 17;
 
 function lerp(a: number, b: number, v: number) {
   return b * v + a * (1 - v);
@@ -12,6 +10,7 @@ export const colorSchemes: { [name: string]: ColorScheme } = {};
 
 function parseColor(color: string | Color): Color {
   if (typeof color == "string") {
+    if (color.startsWith("#")) color = color.substring(1);
     const n = +("0x" + color);
     return [
       ((n >> 16) & 0xff) / 0xff,
@@ -47,27 +46,33 @@ export default class ColorScheme {
     return [lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)];
   }
 
+  get interpolationSteps() {
+    return Math.min(maxInterpolationSteps, this.steps.length);
+  }
+
   get uniforms() {
     if (!this._uniformCache) {
       const uc: number[] = [];
-      for (let i = 0; i <= interpolationSteps; ++i)
-        uc.push(...this.get(i / interpolationSteps));
+      for (let i = 0; i <= this.interpolationSteps; ++i)
+        uc.push(...this.get(i / this.interpolationSteps));
       this._uniformCache = uc;
     }
     return {
       uColorScheme: this._uniformCache,
       uColorSchemeNegative: this.negative,
       uColorSchemeAxes: this.axes,
+      uColorSchemeSteps: this.interpolationSteps,
     };
   }
 
   static glslCode: string = (() => {
-    let code = `uniform vec3 uColorScheme[${interpolationSteps + 1}];`;
+    let code = `uniform vec3 uColorScheme[${maxInterpolationSteps + 1}];`;
     code += `uniform vec3 uColorSchemeNegative;`;
     code += `uniform vec3 uColorSchemeAxes;`;
+    code += `uniform int uColorSchemeSteps;`;
     code += `vec3 colorScheme(float v) {`;
     code += `if(v < 0.0) return uColorSchemeNegative;`;
-    code += `v = fract(v) * float(${interpolationSteps});`;
+    code += `v = fract(v) * float(uColorSchemeSteps);`;
     code += `int i = int(v);`;
     code += `return mix(uColorScheme[i], uColorScheme[i + 1], v - float(i));`;
     code += `}`;
@@ -92,35 +97,54 @@ function createScheme(
   colorSchemes[name] = new ColorScheme(name, colors, negative, axes);
 }
 
+function bidirectional(r: ColorArg[]): ColorArg[] {
+  const a = [...r];
+  a.push(...r.slice(1, -1).reverse());
+  return a;
+}
+
 createScheme("UGent", [
-  "1E64C8",
-  "71A860",
-  "FFD200",
-  "F1A42B",
-  "DC4E28",
-  "825491",
+  "#1E64C8",
+  "#71A860",
+  "#FFD200",
+  "#F1A42B",
+  "#DC4E28",
+  "#825491",
 ]);
 createScheme("Rainbow", [
-  "ff7f00",
-  "7fff00",
-  "00ff7f",
-  "007fff",
-  "7f00ff",
-  "ff007f",
+  "#ff7f00",
+  "#7fff00",
+  "#00ff7f",
+  "#007fff",
+  "#7f00ff",
+  "#ff007f",
 ]);
-createScheme("Gray", ["FFFFFF", "999999"], "000000", "777777");
+createScheme("Gray", ["#FFFFFF", "#999999"], "#000000", "#777777");
 createScheme(
   "Pink",
-  ["91589C", "B26AA6", "C87DA2", "D28AC6", "D198DB"],
-  "FF7BE2"
+  ["#91589C", "#B26AA6", "#C87DA2", "#D28AC6", "#D198DB"],
+  "#FF7BE2"
 );
 createScheme(
   "Hot and cold",
-  [
+  bidirectional([
     [0.2298057, 0.298717966, 0.753683153],
     [0.865395197, 0.86541021, 0.865395561],
     [0.705673158, 0.01555616, 0.150232812],
-    [0.865395197, 0.86541021, 0.865395561],
+  ]),
+  "#000000"
+);
+createScheme(
+  "Winter and spring",
+  [
+    "#306BC5",
+    "#14a6a5",
+    "#59cf85",
+    "#D8E74A",
+    "#CCA940",
+    "#F3D89F",
+    "#A5D82D",
+    "#71CFC3",
   ],
-  "000000"
+  "#000000"
 );
