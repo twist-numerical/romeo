@@ -9,6 +9,7 @@ const MAX_STEPS = 100;
 const srcShader = `
 #define newton_MAXSTEPS ${MAX_STEPS}
 #define newton_log10 ${Math.log(10)}
+#define newton_log2 ${Math.log(2)}
 #define newton_pi 3.14159265358
 
 out vec4 oColor;
@@ -44,7 +45,8 @@ void main() {
     fc = f(c);
     dc = newton_cdiv(fc, df(c));
     if(newton_iswrong(dc)) break;
-    if(length(fc) < 1e-2 && length(dc) < 1e-6) {
+    if(length(fc) < 1e-2 && length(dc) < 1e-4) {
+      c -= dc;
       steps = float(i);
       break;
     }
@@ -59,8 +61,9 @@ void main() {
     vec3 col = colorScheme(l*43.223 + (l < 1e-3 ? 0.0 : angle));
     if(uShadeSmooth) {
       float ldc = length(dc);
-      float v = 1. + (log(ldc)/newton_log10 + 6.)/6.;
-      steps += clamp(v, 0., 1.);
+      float v = log(log(ldc)/(-4.0*newton_log10))/newton_log2;
+      if(!isnan(v))
+        steps -= clamp(v, 0., 1.);
     }
     col = mix(uColorSchemeNegative, col, exp(-pow(0.04*float(steps), 2.0)));
 
