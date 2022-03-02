@@ -9,8 +9,8 @@
   SidePanel(icon="bi-list", position="top right")
     form.p-3
       fieldset
-        legend Romeo
-        .form-label Colour scheme
+        legend {{ $t('julia.title') }}
+        .form-label {{ $t('general.color_scheme') }}
         .ps-3
           label.form-check(v-for="scheme of colorSchemes")
             input.form-check-input(
@@ -24,7 +24,7 @@
 
       label.form-check.form-switch
         input.form-check-input(type="checkbox", v-model="axes")
-        .form-check-label Show axes
+        .form-check-label {{ $t('general.show_axes') }}
 
       hr
 
@@ -33,19 +33,19 @@
         type="button",
         @click.prevent="",
         disabled
-      ) Loading image...
+      ) {{ $t('general.image_loading') }}
       button.btn.btn-link(
         v-else,
         type="button",
         @click.prevent="downloadImage"
-      ) Download image
+      ) {{ $t('general.download_image') }}
 
-      button.btn.btn-secondary(type="button", @click.prevent="resetView") Reset view
+      button.btn.btn-secondary(type="button", @click.prevent="resetView") {{ $t('general.reset_view') }}
 
   SidePanel(icon="bi-info", position="bottom right", :open="true")
     .p-3
-      p Test
-      p A few interesting values for c.
+      p(v-html="$t('julia.info')")
+      p {{ $t('julia.interesting_values') }}
       ul
         li(v-for="value in interesting")
           a(href="#", @click.prevent="marker = value")

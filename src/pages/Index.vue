@@ -17,10 +17,10 @@ div
         .card
           img.card-img-top(src="../assets/julia.png")
           .card-body
-            h5.card-title Julia
+            h5.card-title {{ $t('julia.title') }}
             p.card-text
-              | Julia
-            a.card-link.stretched-link(href="julia.html") Julia
+              | {{ $t('julia.subtitle') }}
+            a.card-link.stretched-link(href="julia.html") {{ $t('julia.overview_link') }}
 
       .col.p-5
         .card
