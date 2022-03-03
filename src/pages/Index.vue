@@ -26,10 +26,10 @@ div
         .card
           img.card-img-top(src="../assets/newton.png")
           .card-body
-            h5.card-title Newton
+            h5.card-title {{ $t('newton.title') }}
             p.card-text
-              | Newton
-            a.card-link.stretched-link(href="newton.html") Newton
+              | {{ $t('newton.subtitle') }}
+            a.card-link.stretched-link(href="newton.html") {{ $t('newton.overview_link') }}
 </template>
 
 <script lang="ts">

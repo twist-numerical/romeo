@@ -2,7 +2,7 @@
 #container
   SidePanel(icon="bi-list", position="top right")
     form.p-3(@submit.prevent)
-      h3 Newton's method
+      h3 {{ $t('newton.title') }}
 
       .input-group
         span.input-group-text f(z) =
@@ -16,29 +16,22 @@
 
       hr 
 
-      .form-label Colour scheme
-      .ps-3
-        label.form-check(v-for="scheme of colorSchemes")
-          input.form-check-input(
-            type="radio",
-            v-model="activeScheme",
-            :value="scheme"
-          )
-          span.form-check-label {{ scheme }}
+      .form-label {{ $t('general.color_scheme') }}
+      ColorSchemePicker.ps-3(v-model="activeScheme")
 
       hr 
 
       label.form-check.form-switch
         input.form-check-input(type="checkbox", v-model="axes")
-        .form-check-label Show axes
+        .form-check-label {{ $t('general.show_axes') }}
 
       label.form-check.form-switch
         input.form-check-input(type="checkbox", v-model="shadeSmooth")
-        .form-check-label Shade smooth
+        .form-check-label {{ $t('general.shade_smooth') }}
 
       label.form-check.form-switch
         input.form-check-input(type="checkbox", v-model="showRoots")
-        .form-check-label Show roots
+        .form-check-label {{ $t('general.show_roots') }}
 
       hr
 
@@ -47,17 +40,19 @@
         type="button",
         @click.prevent="",
         disabled
-      ) Loading image...
+      ) {{ $t('general.image_loading') }}
       button.btn.btn-link(
         v-else,
         type="button",
         @click.prevent="downloadImage"
-      ) Download image
+      ) {{ $t('general.download_image') }}
 
-      button.btn.btn-secondary(type="button", @click.prevent="resetView") Reset view
+      button.btn.btn-secondary(type="button", @click.prevent="resetView") {{ $t('general.reset_view') }}
 
   SidePanel(icon="bi-info", position="bottom right", :open="true")
     .p-3
+      p(v-html="$t('newton.info')")
+      p {{ $t('newton.interesting_functions') }}
       ul
         li(v-for="value in interesting")
           a(href="#", @click.prevent="formula = value")
@@ -78,10 +73,10 @@ import { defineComponent } from "vue";
 import Newton from "../components/Newton.vue";
 import ComplexNumber from "../components/ComplexNumber.vue";
 import SidePanel from "../components/SidePanel.vue";
-import { colorSchemes } from "../util/ColorScheme";
 import downloadImage from "../util/downloadImage";
 import * as parser from "../util/complexParser";
 import * as math from "mathjs";
+import ColorSchemePicker from "../components/ColorSchemePicker.vue";
 
 const getDownloadSize = (() => {
   const w = window as any;
@@ -107,10 +102,10 @@ export default defineComponent({
     Newton,
     SidePanel,
     ComplexNumber,
+    ColorSchemePicker,
   },
   data() {
     return {
-      colorSchemes: Object.keys(colorSchemes),
       activeScheme: "UGent",
       axes: false,
       loadingDownload: false,

@@ -25,6 +25,7 @@ export default class ColorScheme {
   readonly negative: Color;
   readonly axes: Color;
   private _uniformCache: number[] | undefined = undefined;
+  readonly translationKey: string;
 
   constructor(
     readonly name: string,
@@ -35,6 +36,11 @@ export default class ColorScheme {
     this.steps = _steps.map(parseColor);
     this.negative = parseColor(_negative);
     this.axes = parseColor(_axes);
+    if (this.name.indexOf('"') >= 0 || this.name.indexOf("\\") >= 0)
+      throw new Error(
+        `Color scheme name should not contain '"' or '\\': ${this.name}.`
+      );
+    this.translationKey = 'color_schemes["' + this.name + '"]';
   }
 
   get(v: number): Color {
@@ -132,33 +138,17 @@ createScheme(
 );
 createScheme(
   "Soft rainbow",
-  ([
-    "#2EC7F1",
-    "#8669B4",
-    "#E43140",
-    "#F0D43A",
-    "#34C74C",
-  ]),
+  ["#2EC7F1", "#8669B4", "#E43140", "#F0D43A", "#34C74C"],
   "#000000"
 );
 createScheme(
   "Dracula",
-  bidirectional([
-    "#384259",
-    "#F73859",
-    "#7AC7C4",
-    "#C4EDDE",
-  ]),
+  bidirectional(["#384259", "#F73859", "#7AC7C4", "#C4EDDE"]),
   "#000000"
 );
 createScheme(
   "Candy",
-  bidirectional([
-    "#6092CA",
-    "#3FC1C9",
-    "#FCE38A",
-    "#FC5185"
-  ]),
+  bidirectional(["#6092CA", "#3FC1C9", "#FCE38A", "#FC5185"]),
   "#000000"
 );
 createScheme(

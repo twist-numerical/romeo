@@ -1,14 +1,33 @@
 general:
   color_scheme: Kleurenschema
   show_axes: Geef assen weer
+  shade_smooth: Zachte overgangen
+  show_roots: Geef nulpunten weer
   download_image: Download afbeelding
   image_loading: Afbeelding aan het laden...
   reset_view: Hercentreren
+
+color_schemes:
+  Gray: Grijs
+  Hot and cold: Warm en koud
+  Soft rainbow: Zachte regenboog
+  Candy: Snoepgoed
+  Christmas: Kerstmis
+  Autumn: Herfst
 
 julia:
   title: Fractalen van Julia
   subtitle: Dit zijn mooie tekeningen
   overview_link: Ontdek ze zelf!
   info: >
-    Deze figuren ontstaan vanuit de functie f(z) = z<sup>2</sup> + c. Het herhaaldelijk toepassen van deze functie vanaf een startpunt zo leidt tot een rij z<sub>n+1</sub> = f(z<sub>n</sub>).Voor bepaalde waarden van zo zal deze rij convergeren, voor andere zal er divergentie optreden.
+    Deze figuren ontstaan vanuit de functie f(z) = z<sup>2</sup> + c. Het herhaaldelijk toepassen van deze functie vanaf een startpunt zo leidt tot een rij z<sub>n+1</sub> = f(z<sub>n</sub>). Voor bepaalde waarden van zo zal deze rij convergeren, voor andere zal er divergentie optreden.
   interesting_values: Enkele interessante waarden voor c.
+
+newton:
+  title: De methode van Newton
+  subtitle: Een paar bloemstukjes
+  overview_link: Ontdek ze zelf!
+  info: >
+    ...
+  interesting_functions: >
+    Enkele functies met een interessante fractaal:

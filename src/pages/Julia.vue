@@ -8,17 +8,10 @@
 )
   SidePanel(icon="bi-list", position="top right")
     form.p-3
-      fieldset
-        legend {{ $t('julia.title') }}
-        .form-label {{ $t('general.color_scheme') }}
-        .ps-3
-          label.form-check(v-for="scheme of colorSchemes")
-            input.form-check-input(
-              type="radio",
-              v-model="activeScheme",
-              :value="scheme"
-            )
-            span.form-check-label {{ scheme }}
+      h3 {{ $t('julia.title') }}
+
+      .form-label {{ $t('general.color_scheme') }}
+      ColorSchemePicker.ps-3(v-model="activeScheme")
 
       hr 
 
@@ -88,9 +81,9 @@ import Julia from "../components/Julia.vue";
 import Mandelbrot from "../components/Mandelbrot.vue";
 import ComplexNumber from "../components/ComplexNumber.vue";
 import SidePanel from "../components/SidePanel.vue";
-import { colorSchemes } from "../util/ColorScheme";
 import downloadImage from "../util/downloadImage";
 import ComplexPlane from "../components/ComplexPlane.vue";
+import ColorSchemePicker from "../components/ColorSchemePicker.vue";
 
 function clamp(a: number, min: number, max: number) {
   return a < min ? min : a > max ? max : a;
@@ -123,6 +116,7 @@ export default defineComponent({
     SidePanel,
     Mandelbrot,
     ComplexNumber,
+    ColorSchemePicker,
   },
   data() {
     const interesting = [
@@ -134,7 +128,6 @@ export default defineComponent({
       [-0.8, 0.156],
     ];
     return {
-      colorSchemes: Object.keys(colorSchemes),
       activeScheme: "Soft rainbow",
       marker: interesting[0],
       isMounted: false,
