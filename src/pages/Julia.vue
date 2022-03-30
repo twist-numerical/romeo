@@ -147,6 +147,11 @@ export default defineComponent({
     };
     this.resizeListener();
     window.addEventListener("resize", this.resizeListener);
+
+    (window as any).getMarker = () => [...this.marker];
+    (window as any).setMarker = (marker: [number, number]) => {
+      this.marker = marker;
+    };
   },
   unmounted() {
     this.isMounted = false;
