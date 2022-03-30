@@ -31,3 +31,8 @@ newton:
     ...
   interesting_functions: >
     Enkele functies met een interessante fractaal:
+
+littlewood:
+  title: Littlewood veeltermen
+  subtitle: Nulpunten!!
+  overview_link: Bekijk ze allemaal

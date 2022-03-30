@@ -30,6 +30,15 @@ div
             p.card-text
               | {{ $t('newton.subtitle') }}
             a.card-link.stretched-link(href="newton.html") {{ $t('newton.overview_link') }}
+      
+      .col.p-5
+        .card
+          img.card-img-top(src="../assets/newton.png")
+          .card-body
+            h5.card-title {{ $t('littlewood.title') }}
+            p.card-text
+              | {{ $t('littlewood.subtitle') }}
+            a.card-link.stretched-link(href="littlewood.html") {{ $t('littlewood.overview_link') }}
 </template>
 
 <script lang="ts">

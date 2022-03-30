@@ -11,6 +11,9 @@ module.exports = {
     newton: {
       entry: "src/pages/newton.ts",
     },
+    littlewood: {
+      entry: "src/pages/littlewood.ts",
+    }
   },
   chainWebpack: (config) => {
     config.module
