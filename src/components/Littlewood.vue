@@ -3,7 +3,9 @@ ComplexPlane(
   ref="complexPlane",
   :update="[shouldUpdate]",
   @render="onRender",
-  @context="onContext"
+  @context="onContext",
+  :zoom="4",
+  :contextAttributes="{ antialias: true }"
 )
 </template>
 
@@ -11,13 +13,19 @@ ComplexPlane(
 import * as twgl from "twgl.js";
 import { defineComponent } from "vue";
 import ComplexPlane from "./ComplexPlane.vue";
-import LittlewoodShader from "../shaders/Littlewood";
+import LittlewoodShader from "@/shaders/Littlewood";
+import ColorScheme from "@/util/ColorScheme";
 
 type CPlane = InstanceType<typeof ComplexPlane>;
 
 export default defineComponent({
   components: { ComplexPlane },
-  props: {},
+  props: {
+    colorScheme: {
+      type: String,
+      default: ColorScheme.randomScheme().name,
+    },
+  },
   data() {
     return {
       shader: null as LittlewoodShader | null,
@@ -35,7 +43,7 @@ export default defineComponent({
     onRender(fb: twgl.FramebufferInfo | null) {
       if (this.shader) {
         this.shader.advance();
-        this.shader.render(fb);
+        this.shader.render(fb,ColorScheme.schemes[this.colorScheme]);
       }
       ++this.shouldUpdate;
     },

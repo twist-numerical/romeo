@@ -30,6 +30,10 @@ export default defineComponent({
     update: {
       default: () => [],
     },
+    contextAttributes: {
+      type: Object,
+      default: () => {},
+    },
   },
   data() {
     return {
@@ -45,7 +49,8 @@ export default defineComponent({
     this.needsUpdate = true;
     this.isMounted = true;
     this.context = twgl.getContext(
-      this.$refs.canvas as HTMLCanvasElement
+      this.$refs.canvas as HTMLCanvasElement,
+      this.contextAttributes
     ) as WebGL2RenderingContext;
     this.$emit("context", this.context);
     this.resize = this.resize.bind(this);

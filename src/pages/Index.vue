@@ -33,7 +33,7 @@ div
       
       .col.p-5
         .card
-          img.card-img-top(src="../assets/newton.png")
+          img.card-img-top(src="../assets/littlewood.png")
           .card-body
             h5.card-title {{ $t('littlewood.title') }}
             p.card-text

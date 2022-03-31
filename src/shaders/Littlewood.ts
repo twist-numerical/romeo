@@ -2,12 +2,11 @@ import * as twgl from "twgl.js";
 import ComplexPlane from "./ComplexPlane";
 import SquareShader from "@/util/SquareShader";
 import { deleteBuffer, deleteFramebuffer } from "@/util/twglDelete";
+import ColorScheme from "@/util/ColorScheme";
 
 const MAX_DEGREE = 16;
 const TEXTURE_WIDTH = 2048;
 const TEXTURE_HEIGHT = ((1 << (MAX_DEGREE + 1)) * MAX_DEGREE) / TEXTURE_WIDTH;
-
-console.log(TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
 const polynomialShader = `
 uniform sampler2D uRoots;
@@ -78,7 +77,7 @@ void main() {
       denominator = cmul(denominator, z - getRoot(polynomialID, k));
     }
 
-  outRoot = z - 0.1; // cdiv(evaluate(polynomialID, z), denominator);
+  outRoot = z - cdiv(evaluate(polynomialID, z), denominator);
 }
 `;
 
@@ -114,17 +113,22 @@ ${polynomialShader}
 in int polynomial;
 in int root;
 
+uniform float uPointSize;
+
 void main() {
   vec2 z = getRoot(polynomial, root);
-  gl_Position = vec4((z - center)/zoom, 0., 1.);
-  gl_PointSize = 10.0;
+  gl_Position = vec4(2.0*(z - center)/zoom, 0., 1.);
+  gl_PointSize = uPointSize;
 }`;
 
 const srcShaderDrawRootsFragment = `
 out vec4 oColor;
+uniform float uPointSize;
+uniform vec3 uColor;
 
 void main() {
-  oColor = vec4(1.0, 0.,0., 1.0);
+  if(length(gl_PointCoord - 0.5) >= 0.5) discard;
+  oColor = vec4(uColor, 1.0);
 }`;
 
 class RootsShader {
@@ -140,7 +144,7 @@ class RootsShader {
     ]);
 
     const polynomials: number[] = [];
-    for (let i = 0; i < 1 << MAX_DEGREE; ++i) polynomials.push(i);
+    for (let i = 0; i < 2 << MAX_DEGREE; ++i) polynomials.push(i);
 
     const roots: number[] = [];
     for (let k = 0; k < MAX_DEGREE; ++k) roots.push(k);
@@ -149,35 +153,29 @@ class RootsShader {
       polynomial: {
         numComponents: 1,
         data: new Int32Array(polynomials),
-        divisor: 1,
+        divisor: 0,
       },
-      root: { numComponents: 1, data: new Int32Array(roots) },
+      root: { divisor: 1, numComponents: 1, data: new Int8Array(roots) },
     });
+
+    // To reset the divisor call this, or make sure other buffers set {divisor: 0}
+    // gl.vertexAttribDivisor(..., 0);
   }
 
   drawDegree(degree: number) {
-    this.buffers.attribs!.root.offset = 0;
-    this.buffers.attribs!.root.size = degree;
-    this.buffers.attribs!.polynomial.offset = 1 << degree;
-    this.buffers.attribs!.polynomial.size = 1 << degree;
     twgl.setBuffersAndAttributes(this.gl, this.programInfo, this.buffers);
     twgl.drawBufferInfo(
       this.gl,
       this.buffers,
       this.gl.POINTS,
-      degree,
-      undefined,
-      1 << degree
+      1 << degree,
+      1 << degree,
+      degree
     );
   }
 
   useProgram() {
     this.gl.useProgram(this.programInfo.program);
-  }
-
-  draw() {
-    this.drawDegree(10);
-    // for (let i = 2; i < MAX_DEGREE; ++i) this.drawDegree(i);
   }
 
   dispose() {
@@ -254,9 +252,7 @@ export default class LittlewoodShader {
     });
   }
 
-  render(fb: twgl.FramebufferInfo | null) {
-    this.advance();
-    console.log("render");
+  render(fb: twgl.FramebufferInfo | null, colorScheme: ColorScheme) {
     twgl.bindFramebufferInfo(this.gl, fb);
     const shader = this.shaders.drawRoots;
     shader.useProgram();
@@ -264,7 +260,13 @@ export default class LittlewoodShader {
     twgl.setUniforms(shader.programInfo, {
       uRoots: this.rootsBuffers[0].attachments[0],
     });
-    shader.draw();
+    for (let i = MAX_DEGREE; i > 2; --i) {
+      twgl.setUniforms(shader.programInfo, {
+        uPointSize: 4 + (4 * (MAX_DEGREE - i)) / MAX_DEGREE,
+        uColor: colorScheme.get(i / MAX_DEGREE),
+      });
+      shader.drawDegree(i);
+    }
   }
 
   dispose() {
