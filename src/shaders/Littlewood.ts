@@ -5,7 +5,9 @@ import { deleteBuffer, deleteFramebuffer } from "@/util/twglDelete";
 
 const MAX_DEGREE = 16;
 const TEXTURE_WIDTH = 2048;
-const TEXTURE_HEIGHT = ((1 << MAX_DEGREE) * MAX_DEGREE) / TEXTURE_WIDTH;
+const TEXTURE_HEIGHT = ((1 << (MAX_DEGREE + 1)) * MAX_DEGREE) / TEXTURE_WIDTH;
+
+console.log(TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
 const polynomialShader = `
 uniform sampler2D uRoots;
@@ -34,11 +36,11 @@ int degree(int polynomial) {
 
 vec2 getRoot(int polynomial, int root) {
   int pos = polynomial * MAX_DEGREE + root;
-  int row = pos / WIDTH;
-  int col = pos % WIDTH;
+  float row = 0.5 + float(pos / WIDTH);
+  float col = 0.5 + float(pos % WIDTH);
   return texture(
     uRoots,
-    vec2(float(col)/float(WIDTH), float(row)/float(HEIGHT))
+    vec2(col/float(WIDTH), row/float(HEIGHT))
   ).xy;
 }
 
@@ -66,7 +68,7 @@ void main() {
   int rootID = rootPosition % MAX_DEGREE;
   int d = degree(polynomialID);
 
-  // if(rootID > d) discard;
+  if(rootID > d) discard;
 
   vec2 z = getRoot(polynomialID, rootID);
 
@@ -76,7 +78,7 @@ void main() {
       denominator = cmul(denominator, z - getRoot(polynomialID, k));
     }
 
-  outRoot = z - cdiv(evaluate(polynomialID, z), denominator);
+  outRoot = z - 0.1; // cdiv(evaluate(polynomialID, z), denominator);
 }
 `;
 
@@ -154,7 +156,6 @@ class RootsShader {
   }
 
   drawDegree(degree: number) {
-    console.log("Drawing degree ", degree);
     this.buffers.attribs!.root.offset = 0;
     this.buffers.attribs!.root.size = degree;
     this.buffers.attribs!.polynomial.offset = 1 << degree;
@@ -197,12 +198,6 @@ export default class LittlewoodShader {
     readonly gl: WebGL2RenderingContext,
     readonly plane: ComplexPlane
   ) {
-    const startingValues = [];
-    for (let r = 0; r < TEXTURE_HEIGHT; ++r)
-      for (let c = 0; c < TEXTURE_WIDTH; ++c) {
-        startingValues.push(2 * Math.random() - 1, 2 * Math.random() - 1);
-      }
-
     const attachments = [
       {
         internalFormat: gl.RG32F,
@@ -242,26 +237,26 @@ export default class LittlewoodShader {
     twgl.bindFramebufferInfo(this.gl, this.rootsBuffers[0]);
     this.gl.drawBuffers([this.gl.COLOR_ATTACHMENT0]);
     shader.draw();
-
-    this.advance();
   }
 
   advance() {
+    const gl = this.gl;
     const shader = this.shaders.findRoots;
 
-    console.log("advancing");
     [0, 1].forEach((i) => {
       shader.useProgram();
       twgl.setUniforms(shader.programInfo, {
         uRoots: this.rootsBuffers[i].attachments[0],
       });
-      twgl.bindFramebufferInfo(this.gl, this.rootsBuffers[1 - i]);
-      this.gl.drawBuffers([this.gl.COLOR_ATTACHMENT0]);
+      twgl.bindFramebufferInfo(gl, this.rootsBuffers[1 - i]);
+      gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
       shader.draw();
     });
   }
 
   render(fb: twgl.FramebufferInfo | null) {
+    this.advance();
+    console.log("render");
     twgl.bindFramebufferInfo(this.gl, fb);
     const shader = this.shaders.drawRoots;
     shader.useProgram();

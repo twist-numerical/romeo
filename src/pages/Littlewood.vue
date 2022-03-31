@@ -38,17 +38,17 @@ export default defineComponent({
   },
   methods: {
     resetView() {
-      (this.$refs.newton as any).resetView();
+      (this.$refs.littlewood as any).resetView();
     },
     async downloadImage() {
       try {
         this.loadingDownload = true;
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
-        const image: ImageData = await (this.$refs.newton as any).generateImage(
+        const image: ImageData = await (this.$refs.littlewood as any).generateImage(
           getDownloadSize()
         );
 
-        let filename = "newton";
+        let filename = "littlewood";
 
         downloadImage(image, filename);
       } finally {
@@ -66,7 +66,7 @@ html,
 body,
 #container,
 #app,
-#newton {
+#littlewood {
   width: 100%;
   height: 100%;
 }
