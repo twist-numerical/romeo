@@ -1,24 +1,25 @@
-# romeo
+# Romeo
 
-## Project setup
+[![Build](https://github.com/twist-numerical/romeo/actions/workflows/romeo.yml/badge.svg)](https://github.com/twist-numerical/romeo/actions/workflows/romeo.yml)
+
+
+## Development
+
+### Project setup
+Before starting, make sure `node` and `npm` are installed.
 ```
 npm install
 ```
+This will install the necessary dependencies.
 
-### Compiles and hot-reloads for development
+### Interactive development
 ```
 npm run serve
 ```
+After this, there will be a development sever running at `localhost:8080`.
 
-### Compiles and minifies for production
+### Production build
 ```
 npm run build
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+The `dist/`-folder contains the static HTML pages, ready to be placed on a web host.
