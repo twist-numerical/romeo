@@ -29,7 +29,7 @@ export default class SquareShader {
 
   constructor(private gl: WebGL2RenderingContext, fragmentShader: string) {
     this.buffers = twgl.createBufferInfoFromArrays(gl, {
-      pixel: { data: [0, 0, 1, 0, 0, 1, 1, 1], numComponents: 2 },
+      pixel: { divisor: 0, data: [0, 0, 1, 0, 0, 1, 1, 1], numComponents: 2 },
     });
     this.programInfo = getProgram(gl, fragmentShader);
   }
