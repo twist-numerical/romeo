@@ -43,7 +43,7 @@ export default defineComponent({
     onRender(fb: twgl.FramebufferInfo | null) {
       if (this.shader) {
         this.shader.advance();
-        this.shader.render(fb,ColorScheme.schemes[this.colorScheme]);
+        this.shader.render(fb, ColorScheme.schemes[this.colorScheme]);
       }
       ++this.shouldUpdate;
     },
