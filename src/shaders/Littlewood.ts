@@ -3,6 +3,7 @@ import ComplexPlane from "./ComplexPlane";
 import SquareShader from "@/util/SquareShader";
 import { deleteBuffer, deleteFramebuffer } from "@/util/twglDelete";
 import ColorScheme from "@/util/ColorScheme";
+import LittlewoodProvenShader from "./LittlewoodProven";
 
 const MAX_DEGREE = 16;
 const TEXTURE_WIDTH = 2048;
@@ -58,6 +59,8 @@ vec2 evaluate(int polynomial, vec2 z) {
 const srcShaderRoots = `
 layout(location=0) out vec2 outRoot;
 
+uniform float uSpeed;
+
 ${polynomialShader}
 
 void main() {
@@ -77,7 +80,7 @@ void main() {
       denominator = cmul(denominator, z - getRoot(polynomialID, k));
     }
 
-  outRoot = z - cdiv(evaluate(polynomialID, z), denominator);
+  outRoot = z - uSpeed * cdiv(evaluate(polynomialID, z), denominator);
 }
 `;
 
@@ -168,9 +171,9 @@ class RootsShader {
       this.gl,
       this.buffers,
       this.gl.POINTS,
-      1 << degree,
-      1 << degree,
-      degree
+      1 << (degree),
+      1 << (degree),
+      degree-1
     );
   }
 
@@ -190,7 +193,9 @@ export default class LittlewoodShader {
     initRoots: SquareShader;
     findRoots: SquareShader;
     drawRoots: RootsShader;
+    littlewoodProven: LittlewoodProvenShader;
   };
+  speed = 1;
 
   constructor(
     readonly gl: WebGL2RenderingContext,
@@ -221,6 +226,7 @@ export default class LittlewoodShader {
       initRoots: new SquareShader(gl, srcShaderInit),
       findRoots: new SquareShader(gl, srcShaderRoots),
       drawRoots: new RootsShader(gl),
+      littlewoodProven: new LittlewoodProvenShader(gl),
     };
 
     this.initRoots();
@@ -245,15 +251,27 @@ export default class LittlewoodShader {
       shader.useProgram();
       twgl.setUniforms(shader.programInfo, {
         uRoots: this.rootsBuffers[i].attachments[0],
+        uSpeed: this.speed,
       });
       twgl.bindFramebufferInfo(gl, this.rootsBuffers[1 - i]);
       gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
       shader.draw();
     });
+
+    this.speed *= 0.999;
   }
 
   render(fb: twgl.FramebufferInfo | null, colorScheme: ColorScheme) {
     twgl.bindFramebufferInfo(this.gl, fb);
+
+    const proven = this.shaders.littlewoodProven;
+    proven.useProgram();
+    twgl.setUniforms(proven.programInfo, {
+      ...this.plane.uniforms,
+      ...colorScheme.uniforms,
+    });
+    proven.draw();
+
     const shader = this.shaders.drawRoots;
     shader.useProgram();
     twgl.setUniforms(shader.programInfo, this.plane.uniforms);
