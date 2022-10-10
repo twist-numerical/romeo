@@ -1,2 +1,19 @@
 $pad: 0.5rem;
 $panel-background: rgba(255, 255, 255, 0.9);
+
+.back-button {
+  display: block;
+  position: absolute;
+  color: black;
+  top: 0;
+  .bi {
+    display: block;
+    margin: $pad 0 0 $pad;
+    width: 5 * $pad;
+    background: $panel-background;
+    border-radius: $pad;
+    font-size: 3.5 * $pad;
+    line-height: 5 * $pad;
+    text-align: center;
+  }
+}

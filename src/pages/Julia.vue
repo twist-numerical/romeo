@@ -6,43 +6,26 @@
   @touchmove="onMove",
   @touchend="onEnd"
 )
-  SidePanel(icon="bi-list", position="top right")
+  a.back-button(href="./index.html")
+    i.bi.bi-box-arrow-left
+
+  SidePanel(icon="bi-info", position="bottom right", :open="true")
     form.p-3
       h3 {{ $t('julia.title') }}
 
-      .form-label {{ $t('general.color_scheme') }}
-      ColorSchemePicker.ps-3(v-model="activeScheme")
-
-      hr 
-
-      label.form-check.form-switch
-        input.form-check-input(type="checkbox", v-model="axes")
-        .form-check-label {{ $t('general.show_axes') }}
-
-      hr
-
-      button.btn.btn-link.disabled(
-        v-if="loadingDownload",
-        type="button",
-        @click.prevent="",
-        disabled
-      ) {{ $t('general.image_loading') }}
-      button.btn.btn-link(
-        v-else,
-        type="button",
-        @click.prevent="downloadImage"
-      ) {{ $t('general.download_image') }}
-
-      button.btn.btn-secondary(type="button", @click.prevent="resetView") {{ $t('general.reset_view') }}
-
-  SidePanel(icon="bi-info", position="bottom right", :open="true")
-    .p-3
       p(v-html="$t('julia.info')")
+
       p {{ $t('julia.interesting_values') }}
       ul
         li(v-for="value in interesting")
           a(href="#", @click.prevent="marker = value")
             ComplexNumber(:value="value")
+
+      label.form-check.form-switch
+        input.form-check-input(type="checkbox", v-model="axes")
+        .form-check-label {{ $t('general.show_axes') }}
+
+      button.btn.btn-secondary(type="button", @click.prevent="resetView") {{ $t('general.reset_view') }}
 
   Julia#julia(
     :colorScheme="activeScheme",
@@ -55,7 +38,6 @@
   .mandelbrot-container
     .mandelbrot-resize
       div(
-        style="transform: scaleX(-1)",
         @mousedown="(e) => (rescalePosition = [e.clientX, e.clientY])",
         @touchstart="onStart"
       )
@@ -202,17 +184,19 @@ export default defineComponent({
 
       event.preventDefault();
 
+      const height = window.innerHeight;
       let p: [number, number];
-      if (event instanceof MouseEvent) p = [event.clientX, event.clientY];
+      if (event instanceof MouseEvent)
+        p = [event.clientX, height - event.clientY];
       else {
         if (event.touches.length != 1) {
           this.rescalePosition = null;
           return;
         }
-        p = [event.touches[0].clientX, event.touches[0].clientY];
+        p = [event.touches[0].clientX, height - event.touches[0].clientY];
       }
 
-      const i = this.size[0] < this.size[0] ? 0 : 1;
+      const i = this.size[0] < this.size[1] ? 0 : 1;
       const v = (this.mandelbrotSizeRatio * p[i]) / this.rescalePosition[i];
       if (0.1 < v && v < 0.8) {
         this.mandelbrotSizeRatio = v;
@@ -275,12 +259,12 @@ body,
 
 .mandelbrot-container {
   position: absolute;
-  top: $pad;
+  bottom: $pad;
   left: $pad;
 
   .mandelbrot-resize {
     position: absolute;
-    bottom: -4 * $pad;
+    top: -4 * $pad;
     right: -4 * $pad;
     border-radius: $pad;
     background: $panel-background;

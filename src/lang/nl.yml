@@ -20,7 +20,7 @@ julia:
   subtitle: Dit zijn mooie tekeningen
   overview_link: Ontdek ze zelf!
   info: >
-    Deze figuren ontstaan vanuit de functie f(z) = z<sup>2</sup> + c. Het herhaaldelijk toepassen van deze functie vanaf een startpunt zo leidt tot een rij z<sub>n+1</sub> = f(z<sub>n</sub>). Voor bepaalde waarden van zo zal deze rij convergeren, voor andere zal er divergentie optreden.
+    Deze figuren ontstaan vanuit de functie f(z) = z<sup>2</sup> + c. Het herhaaldelijk toepassen van deze functie vanaf een startpunt z<sub>0</sub> leidt tot een rij z<sub>n+1</sub> = f(z<sub>n</sub>). Voor bepaalde waarden van z<sub>0</sub> zal deze rij convergeren, voor andere zal er divergentie optreden.
   interesting_values: Enkele interessante waarden voor c.
 
 newton:

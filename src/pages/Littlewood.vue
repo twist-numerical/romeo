@@ -1,25 +1,30 @@
 <template lang="pug">
 #container
+  a.back-button(href="./index.html")
+    i.bi.bi-box-arrow-left
   SidePanel(icon="bi-list", position="top right")
     form.p-3
       h3 {{ $t('littlewood.title') }}
 
-      .form-label {{ $t('general.color_scheme') }}
-      ColorSchemePicker.ps-3(v-model="activeScheme")
+      //
+        .form-label {{ $t('general.color_scheme') }}
+        ColorSchemePicker.ps-3(v-model="activeScheme")
 
       hr 
 
-      button.btn.btn-link.disabled(
-        v-if="loadingDownload",
-        type="button",
-        @click.prevent="",
-        disabled
-      ) {{ $t('general.image_loading') }}
-      button.btn.btn-link(
-        v-else,
-        type="button",
-        @click.prevent="downloadImage"
-      ) {{ $t('general.download_image') }}
+      //
+        button.btn.btn-link.disabled(
+          v-if="loadingDownload",
+          type="button",
+          @click.prevent="",
+          disabled
+        ) {{ $t('general.image_loading') }}
+      //
+        button.btn.btn-link(
+          v-else,
+          type="button",
+          @click.prevent="downloadImage"
+        ) {{ $t('general.download_image') }}
 
       button.btn.btn-secondary(type="button", @click.prevent="resetView") {{ $t('general.reset_view') }}
 

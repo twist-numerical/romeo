@@ -1,6 +1,9 @@
 <template lang="pug">
 #container
-  SidePanel(icon="bi-list", position="top right")
+  a.back-button(href="./index.html")
+    i.bi.bi-box-arrow-left
+
+  SidePanel(icon="bi-info", position="bottom right", :open="true")
     form.p-3(@submit.prevent)
       h3 {{ $t('newton.title') }}
 
@@ -14,12 +17,12 @@
         )
         .invalid-feedback {{ errorMessage }}
 
-      hr 
-
-      .form-label {{ $t('general.color_scheme') }}
-      ColorSchemePicker.ps-3(v-model="activeScheme")
-
-      hr 
+      p(v-html="$t('newton.info')")
+      p {{ $t('newton.interesting_functions') }}
+      ul
+        li(v-for="value in interesting")
+          a(href="#", @click.prevent="formula = value")
+            | f(z) = {{ value }}
 
       label.form-check.form-switch
         input.form-check-input(type="checkbox", v-model="axes")
@@ -33,30 +36,7 @@
         input.form-check-input(type="checkbox", v-model="showRoots")
         .form-check-label {{ $t('general.show_roots') }}
 
-      hr
-
-      button.btn.btn-link.disabled(
-        v-if="loadingDownload",
-        type="button",
-        @click.prevent="",
-        disabled
-      ) {{ $t('general.image_loading') }}
-      button.btn.btn-link(
-        v-else,
-        type="button",
-        @click.prevent="downloadImage"
-      ) {{ $t('general.download_image') }}
-
       button.btn.btn-secondary(type="button", @click.prevent="resetView") {{ $t('general.reset_view') }}
-
-  SidePanel(icon="bi-info", position="bottom right", :open="true")
-    .p-3
-      p(v-html="$t('newton.info')")
-      p {{ $t('newton.interesting_functions') }}
-      ul
-        li(v-for="value in interesting")
-          a(href="#", @click.prevent="formula = value")
-            | f(z) = {{ value }}
 
   Newton#newton(
     :colorScheme="activeScheme",
@@ -112,7 +92,7 @@ export default defineComponent({
       shadeSmooth: false,
       showRoots: false,
       formula: "z^5 - 1",
-      interesting: ["z^5 - 1", "cos(z)", "z^3 - 1"],
+      interesting: ["z^5 - 1", "cos(z)", "z^3 - 1", "z^-3 - z"],
       shader: null as null | string,
       errorMessage: "",
     };
