@@ -71,9 +71,11 @@ export default defineComponent({
 
     .side-panel-content {
       width: $width;
+      max-height: calc(100vh - 2 * $pad);
+      overflow-y: auto;
       background: $panel-background;
       border-radius: $pad;
-      overflow: hidden;
+      overflow-x: hidden;
     }
   }
 

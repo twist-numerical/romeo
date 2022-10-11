@@ -17,18 +17,18 @@ color_schemes:
 
 julia:
   title: Fractalen van Julia
-  subtitle: Dit zijn mooie tekeningen
-  overview_link: Ontdek ze zelf!
+  subtitle: Een eenvoudige functie zorgt voor vele mooie fractalen
+  overview_link: Verken alle fractalen!
   info: >
     Deze figuren ontstaan vanuit de functie f(z) = z<sup>2</sup> + c. Het herhaaldelijk toepassen van deze functie vanaf een startpunt z<sub>0</sub> leidt tot een rij z<sub>n+1</sub> = f(z<sub>n</sub>). Voor bepaalde waarden van z<sub>0</sub> zal deze rij convergeren, voor andere zal er divergentie optreden.
-  interesting_values: Enkele interessante waarden voor c.
+  interesting_values: "Enkele interessante waarden voor c:"
 
 newton:
   title: De methode van Newton
-  subtitle: Een paar bloemstukjes
-  overview_link: Ontdek ze zelf!
+  subtitle: Bij het zoeken van nulpunten van functies ontstaan prachtige tekeningen.
+  overview_link: Probeer zelf verschillende functies uit!
   info: >
-    ...
+    In de numerieke wiskunde is de methode van Newton een techniek waarmee nulpunten van functies benaderd kunnen worden. Hiervoor start je met een zekere beginwaarde z en dan pas je een schema toe waardoor deze waarde zal convergeren naar een nulpunten. Deze tekening beantwoord de vraag naar welk nulpunt en hoe snel elk complexe beginpunt convergeert.
   interesting_functions: >
     Enkele functies met een interessante fractaal:
 

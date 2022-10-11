@@ -7,34 +7,36 @@
     form.p-3(@submit.prevent)
       h3 {{ $t('newton.title') }}
 
-      .input-group
-        span.input-group-text f(z) =
-        input.form-control(
-          type="text",
-          :class="{ 'is-invalid': !!errorMessage }",
-          :value="formula",
-          @change="(e) => (formula = e.target.value)"
-        )
-        .invalid-feedback {{ errorMessage }}
+      p
+        .input-group
+          span.input-group-text f(z) =
+          input.form-control(
+            type="text",
+            :class="{ 'is-invalid': !!errorMessage }",
+            :value="formula",
+            @change="(e) => (formula = e.target.value)"
+          )
+          .invalid-feedback {{ errorMessage }}
 
       p(v-html="$t('newton.info')")
+
       p {{ $t('newton.interesting_functions') }}
       ul
         li(v-for="value in interesting")
           a(href="#", @click.prevent="formula = value")
             | f(z) = {{ value }}
+      p
+        label.form-check.form-switch
+          input.form-check-input(type="checkbox", v-model="axes")
+          .form-check-label {{ $t('general.show_axes') }}
 
-      label.form-check.form-switch
-        input.form-check-input(type="checkbox", v-model="axes")
-        .form-check-label {{ $t('general.show_axes') }}
+        label.form-check.form-switch
+          input.form-check-input(type="checkbox", v-model="shadeSmooth")
+          .form-check-label {{ $t('general.shade_smooth') }}
 
-      label.form-check.form-switch
-        input.form-check-input(type="checkbox", v-model="shadeSmooth")
-        .form-check-label {{ $t('general.shade_smooth') }}
-
-      label.form-check.form-switch
-        input.form-check-input(type="checkbox", v-model="showRoots")
-        .form-check-label {{ $t('general.show_roots') }}
+        label.form-check.form-switch
+          input.form-check-input(type="checkbox", v-model="showRoots")
+          .form-check-label {{ $t('general.show_roots') }}
 
       button.btn.btn-secondary(type="button", @click.prevent="resetView") {{ $t('general.reset_view') }}
 
@@ -157,5 +159,6 @@ body,
 #newton {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 </style>

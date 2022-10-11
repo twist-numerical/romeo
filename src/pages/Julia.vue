@@ -21,9 +21,10 @@
           a(href="#", @click.prevent="marker = value")
             ComplexNumber(:value="value")
 
-      label.form-check.form-switch
-        input.form-check-input(type="checkbox", v-model="axes")
-        .form-check-label {{ $t('general.show_axes') }}
+      p
+        label.form-check.form-switch
+          input.form-check-input(type="checkbox", v-model="axes")
+          .form-check-label {{ $t('general.show_axes') }}
 
       button.btn.btn-secondary(type="button", @click.prevent="resetView") {{ $t('general.reset_view') }}
 
@@ -255,6 +256,7 @@ body,
 #julia {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 .mandelbrot-container {
