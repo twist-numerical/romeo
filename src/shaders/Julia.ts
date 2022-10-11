@@ -71,15 +71,59 @@ void main() {
   int steps = texture(uSteps, vPixel).r;
   oColor = vec4(color(steps < 0 ? -1 : steps), 1.0);
 }`;
+const srcShaderDirect =
+  ComplexPlane.header +
+  ColorScheme.glslCode +
+  `
+#define MAXSTEPS ${STEPS_PER_STAGE}
+
+out vec4 oColor;
+uniform vec2 c;
+
+vec3 color(int steps) {
+  return colorScheme(float(steps)/60.0);
+}
+
+vec2 cMul(vec2 a, vec2 b) {
+  return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+float cMod(vec2 a) {
+  return length(a);
+}
+
+void main() {
+  vec2 z = point();
+  int steps = -1;
+  
+  if(steps < 0) {
+    for(int i = 0; i < MAXSTEPS; ++i) {
+      if(cMod(z) > 2.0) {
+        steps = -steps - 1;
+        break;
+      }
+      --steps;
+      z = cMul(z, z) + c;
+    }
+  }
+
+  oColor = vec4(color(steps < 0 ? -1 : steps), 1.0);
+}`;
 
 export default class Julia {
   framebuffers: [twgl.FramebufferInfo, twgl.FramebufferInfo];
   attachments: twgl.AttachmentOptions[];
-  shaders: { init: SquareShader; advance: SquareShader; render: SquareShader };
+  shaders: {
+    init: SquareShader;
+    advance: SquareShader;
+    render: SquareShader;
+    direct: SquareShader;
+  };
   stepsExecuted = 0;
   c: [number, number] = [0, 0];
   axes: Axes;
   drawAxes: boolean = true;
+  direct: boolean = true;
 
   constructor(
     readonly gl: WebGL2RenderingContext,
@@ -105,19 +149,23 @@ export default class Julia {
       init: new SquareShader(gl, srcShaderInit),
       advance: new SquareShader(gl, srcShaderAdvance),
       render: new SquareShader(gl, srcShaderRender),
+      direct: new SquareShader(gl, srcShaderDirect),
     };
 
     this.axes = new Axes(gl, plane);
   }
 
   resize(width: number, height: number) {
+    if (this.direct) return;
     this.framebuffers.forEach((f) =>
       twgl.resizeFramebufferInfo(this.gl, f, this.attachments, width, height)
     );
   }
 
   changeView() {
+    if (this.direct) return;
     const shader = this.shaders.init;
+
     shader.useProgram();
     twgl.setUniforms(shader.programInfo, this.plane.uniforms);
     twgl.bindFramebufferInfo(this.gl, this.framebuffers[0]);
@@ -127,6 +175,8 @@ export default class Julia {
   }
 
   advance() {
+    if (this.direct) return;
+
     const shader = this.shaders.advance;
 
     [0, 1].forEach((i) => {
@@ -148,14 +198,26 @@ export default class Julia {
 
   render(fb: twgl.FramebufferInfo | null, colorScheme: ColorScheme) {
     twgl.bindFramebufferInfo(this.gl, fb);
-    const shader = this.shaders.render;
-    shader.useProgram();
-    twgl.setUniforms(shader.programInfo, colorScheme.uniforms);
-    twgl.setUniforms(shader.programInfo, {
-      uZ: this.framebuffers[0].attachments[0],
-      uSteps: this.framebuffers[0].attachments[1],
-    });
-    shader.draw();
+
+    if (this.direct) {
+      const shader = this.shaders.direct;
+      shader.useProgram();
+      twgl.setUniforms(shader.programInfo, colorScheme.uniforms);
+      twgl.setUniforms(shader.programInfo, this.plane.uniforms);
+      twgl.setUniforms(shader.programInfo, {
+        c: this.c,
+      });
+      shader.draw();
+    } else {
+      const shader = this.shaders.render;
+      shader.useProgram();
+      twgl.setUniforms(shader.programInfo, colorScheme.uniforms);
+      twgl.setUniforms(shader.programInfo, {
+        uZ: this.framebuffers[0].attachments[0],
+        uSteps: this.framebuffers[0].attachments[1],
+      });
+      shader.draw();
+    }
 
     if (this.drawAxes) this.axes.render(fb, colorScheme);
   }
