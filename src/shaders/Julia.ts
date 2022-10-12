@@ -5,7 +5,7 @@ import SquareShader from "@/util/SquareShader";
 import { deleteFramebuffer } from "@/util/twglDelete";
 import Axes from "./Axes";
 
-const STEPS_PER_STAGE = 200;
+const STEPS_PER_STAGE = 150;
 
 const srcShaderInit =
   ComplexPlane.header +

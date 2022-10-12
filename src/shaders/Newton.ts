@@ -4,7 +4,7 @@ import ComplexPlane from "./ComplexPlane";
 import SquareShader from "@/util/SquareShader";
 import Axes from "./Axes";
 
-const MAX_STEPS = 100;
+const MAX_STEPS = 50;
 
 const srcShader = `
 #define newton_MAXSTEPS ${MAX_STEPS}
