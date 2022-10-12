@@ -149,9 +149,10 @@ export default defineComponent({
 
       const [x, y] = (this as any).marker;
       const [cx, cy] = plane.center as [number, number];
+      const vmin = plane.vmin / window.devicePixelRatio;
       return {
-        left: plane.vmin * (0.5 + (x - cx) / plane.zoom) + "px",
-        top: plane.vmin * (0.5 + (cy - y) / plane.zoom) + "px",
+        left: vmin * (0.5 + (x - cx) / plane.zoom) + "px",
+        top: vmin * (0.5 + (cy - y) / plane.zoom) + "px",
       };
     },
     mandelbrotSize() {
@@ -215,9 +216,11 @@ export default defineComponent({
 
       const [cx, cy] = plane.center as [number, number];
 
+      const scale = plane.zoom;
+      const vmin = plane.vmin / window.devicePixelRatio;
       this.marker = [
-        cx + plane.zoom * ((event.clientX - rect.x) / plane.vmin - 0.5),
-        cy + plane.zoom * (0.5 - (event.clientY - rect.y) / plane.vmin),
+        cx + scale * ((event.clientX - rect.x) / vmin - 0.5),
+        cy + scale * (0.5 - (event.clientY - rect.y) / vmin),
       ];
     },
     resetView() {

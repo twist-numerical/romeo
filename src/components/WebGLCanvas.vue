@@ -79,7 +79,10 @@ export default defineComponent({
     resize(): void {
       const canvas = this.$refs.canvas as undefined | HTMLCanvasElement;
       if (canvas) {
-        twgl.resizeCanvasToDisplaySize(canvas, this.scaling);
+        twgl.resizeCanvasToDisplaySize(
+          canvas,
+          this.scaling * window.devicePixelRatio
+        );
         this.$emit("resize", canvas.width, canvas.height);
       }
     },
