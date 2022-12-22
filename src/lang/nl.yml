@@ -28,7 +28,7 @@ newton:
   subtitle: Bij het zoeken van nulpunten van functies ontstaan prachtige tekeningen.
   overview_link: Probeer zelf verschillende functies uit!
   info: >
-    In de numerieke wiskunde is de methode van Newton een techniek waarmee nulpunten van functies benaderd kunnen worden. Hiervoor start je met een zekere beginwaarde z en dan pas je een schema toe waardoor deze waarde zal convergeren naar een nulpunten. Deze tekening beantwoord de vraag naar welk nulpunt en hoe snel elk complexe beginpunt convergeert.
+    In de numerieke wiskunde is de methode van Newton een techniek waarmee nulpunten van functies benaderd kunnen worden. Hiervoor start je met een zekere beginwaarde z en dan pas je een schema toe waardoor deze waarde zal convergeren naar een nulpunt. Deze tekening beantwoordt de vraag naar welk nulpunt en hoe snel elk complex beginpunt convergeert.
   interesting_functions: >
     Enkele functies met een interessante fractaal:
 
